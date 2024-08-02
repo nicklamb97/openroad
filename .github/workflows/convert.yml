@@ -9,7 +9,7 @@ on:
 env:
   PYTHON_VERSION: '3.10'
   MODEL_REPO: 'lmstudio-community/Mistral-7B-Instruct-v0.3-GGUF'
-  MODEL_FILE: 'Mistral-7B-Instruct-v0.3.Q4_K_M.gguf'
+  MODEL_FILE: 'Mistral-7B-Instruct-v0.3-Q4_K_M.gguf'
 
 jobs:
   convert_and_pr:
