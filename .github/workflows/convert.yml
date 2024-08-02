@@ -8,6 +8,7 @@ on:
 
 env:
   PYTHON_VERSION: '3.10'
+  MODEL_NAME: 'mistralai/Mistral-7B-v0.3'
 
 jobs:
   convert_and_pr:
@@ -53,3 +54,12 @@ jobs:
           echo "=========================="
           echo ""
         done
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install transformers torch sentencepiece
+
+    - name: Download Mistral 7B v0.3 model
+      run: |
+        python -c "from transformers import AutoTokenizer, AutoModelForCausalLM; tokenizer = AutoTokenizer.from_pretrained('${{ env.MODEL_NAME }}'); model = AutoModelForCausalLM.from_pretrained('${{ env.MODEL_NAME }}')"
