@@ -8,7 +8,7 @@ on:
 
 env:
   PYTHON_VERSION: '3.10'
-  MODEL_NAME: 'NickLamb/OpenROAD-8B-Instruct'
+  MODEL_NAME: 'NickLamb/Mistral-7B-Instruct-v0.3'
 
 jobs:
   convert_and_pr:
@@ -76,8 +76,8 @@ jobs:
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: |
-        echo "📥 Downloading OpenROAD-8B-Instruct model..."
-        HF_TOKEN="$HF_TOKEN" ilab model download --repository=${{ env.MODEL_NAME }} --filename=OpenROAD-8B-Instruct.Q4_K_M.gguf
+        echo "📥 Downloading Mistral-7B-Instruct-v0.3 model..."
+        HF_TOKEN="$HF_TOKEN" ilab model download --repository=${{ env.MODEL_NAME }} --filename=Mistral-7B-Instruct-v0.3.Q4_K_M.gguf
         echo "✅ Model downloaded successfully"
         echo "MODEL_DOWNLOADED=true" >> "$GITHUB_ENV"
 
