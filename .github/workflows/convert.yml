@@ -108,15 +108,15 @@ jobs:
           output_file="converted_files/$(basename "${file%.py}.cs")"
           
           csharp_code=$(ilab model chat -qq <<EOF
-Convert the following Python code to C#:
+          Convert the following Python code to C#:
 
-Python code:
-$python_code
+          Python code:
+          $python_code
 
-C# code:
-EOF
-)
-          
+          C# code:
+          EOF
+          )
+                    
           echo "$csharp_code" > "$output_file"
           echo "Converted $file to $output_file"
         done
