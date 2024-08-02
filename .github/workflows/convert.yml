@@ -1,10 +1,10 @@
-name: Convert OpenROAD to C# and Create PR
+name: Convert Python to C# and Create PR
 
 on:
   push:
     branches: [ main ]
     paths:
-      - '**.4gl'  # This will only trigger on .4gl file changes
+      - '**.py'  # This will only trigger on .py file changes
 
 env:
   PYTHON_VERSION: '3.10'
@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout OpenROAD repo
+    - name: Checkout Python repo
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
@@ -42,12 +42,3 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
-      
-    - name: Install dependencies
-      run: |
-        echo "🔧 Installing required Python packages..."
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        echo "✅ Dependencies installed successfully"
-        pip list
-        echo "📦 Above is the list of installed packages"
