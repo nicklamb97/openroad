@@ -1,0 +1,53 @@
+name: Convert OpenROAD to C# and Create PR
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '**.4gl'  # This will only trigger on .4gl file changes
+
+env:
+  PYTHON_VERSION: '3.10'
+
+jobs:
+  convert_and_pr:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout OpenROAD repo
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+      
+    - name: Get commit message
+      run: |
+        echo "📜 Retrieving commit message for SHA: ${{ github.sha }}"
+        COMMIT_MESSAGE=$(git log --format=%B -n 1 "${{ github.sha }}")
+        {
+          echo "COMMIT_MESSAGE<<EOF"
+          echo "$COMMIT_MESSAGE"
+          echo "EOF"
+        } >> "$GITHUB_ENV"
+        echo "✅ Commit message retrieved and stored in environment variable"
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Cache Python dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+      
+    - name: Install dependencies
+      run: |
+        echo "🔧 Installing required Python packages..."
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        echo "✅ Dependencies installed successfully"
+        pip list
+        echo "📦 Above is the list of installed packages"
