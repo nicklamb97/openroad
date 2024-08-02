@@ -81,36 +81,75 @@ jobs:
         echo "✅ Model downloaded successfully"
         echo "MODEL_DOWNLOADED=true" >> "$GITHUB_ENV"
 
-    - name: Convert Python to C#
+    - name: Start InstructLab server and convert Python to C#
       if: env.MODEL_DOWNLOADED == 'true'
       run: |
+        # Create a named pipe for communication
+        mkfifo serverpipe
+
+        # Start the server in the background, redirecting output to the pipe
+        ilab serve > serverpipe 2>&1 &
+        SERVER_PID=$!
+
+        # Wait for the server to start (look for a specific message in the output)
+        while read line; do
+          echo "$line"
+          if [[ $line == *"Server started successfully"* ]]; then
+            break
+          fi
+        done < serverpipe &
+
+        # Give the server a moment to fully initialize
+        sleep 10
+
+        # Perform the conversion
+        mkdir -p converted_files
         git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep '\.py$' | while read file; do
           echo "Converting $file to C#"
           python_code=$(cat "$file")
-          output_file="${file%.py}.cs"
+          output_file="converted_files/$(basename "${file%.py}.cs")"
           
-          csharp_code=$(ilab chat -m OpenROAD-8B-Instruct --prompt "Convert the following Python code to C#:
-
+          csharp_code=$(ilab chat --prompt "Convert the following Python code to C#:
         Python code:
         $python_code
-
         C# code:")
           
           echo "$csharp_code" > "$output_file"
           echo "Converted $file to $output_file"
         done
 
-    - name: Create Pull Request
-      uses: peter-evans/create-pull-request@v5
+        # Stop the server
+        kill $SERVER_PID
+        wait $SERVER_PID
+
+        # Clean up the named pipe
+        rm serverpipe
+
+    - name: Checkout C# repo
+      uses: actions/checkout@v3
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        commit-message: "Convert Python to C#: ${{ env.COMMIT_MESSAGE }}"
-        title: "Automated Python to C# Conversion"
-        body: |
-          This PR contains automatically converted C# code based on the following commit:
+        repository: nicklamb97/csharp
+        path: csharp_repo
+        token: ${{ secrets.PAT_TOKEN }}
 
-          ${{ env.COMMIT_MESSAGE }}
-
-          Please review the converted code and merge if appropriate.
-        branch: auto-convert-python-to-csharp
-        base: main
+    - name: Copy converted files and create PR
+      run: |
+        cp -r converted_files/* csharp_repo/
+        cd csharp_repo
+        git config user.name "GitHub Actions Bot"
+        git config user.email "<>"
+        git add .
+        git commit -m "Convert Python to C#: ${{ env.COMMIT_MESSAGE }}"
+        git push origin HEAD:auto-convert-python-to-csharp
+        
+        PR_URL=$(curl -X POST -H "Authorization: token ${{ secrets.PAT_TOKEN }}" \
+             -H "Accept: application/vnd.github.v3+json" \
+             https://api.github.com/repos/nicklamb97/csharp/pulls \
+             -d "{
+               \"title\": \"Automated Python to C# Conversion\",
+               \"body\": \"This PR contains automatically converted C# code based on the following commit:\\n\\n${{ env.COMMIT_MESSAGE }}\\n\\nPlease review the converted code and merge if appropriate.\",
+               \"head\": \"auto-convert-python-to-csharp\",
+               \"base\": \"main\"
+             }" | jq -r .html_url)
+        
+        echo "Pull request created: $PR_URL"
