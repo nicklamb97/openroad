@@ -8,7 +8,7 @@ on:
 
 env:
   PYTHON_VERSION: '3.10'
-  MODEL_NAME: 'mistralai/Mistral-7B-v0.3'
+  MODEL_NAME: 'lmstudio-community/Mistral-7B-Instruct-v0.3-GGUF'
 
 jobs:
   convert_and_pr:
