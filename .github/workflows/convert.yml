@@ -2,14 +2,13 @@ name: Convert Python to C# and Create PR
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
     paths:
-      - '**.py'
+      - '**.py'  # This will only trigger on .py file changes
 
 env:
   PYTHON_VERSION: '3.10'
-  MODEL_REPO: 'lmstudio-community/Mistral-7B-Instruct-v0.3-GGUF'
-  MODEL_FILE: 'Mistral-7B-Instruct-v0.3-Q4_K_M.gguf'
+  MODEL_NAME: 'mistralai/Mistral-7B-Instruct-v0.3'
 
 jobs:
   convert_and_pr:
@@ -61,11 +60,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install transformers torch sentencepiece huggingface_hub
 
-    - name: Download Mistral 7B v0.3 model file
+    - name: Download Mistral 7B v0.3 model
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: |
-        python -c "from huggingface_hub import hf_hub_download; hf_hub_download(repo_id='${{ env.MODEL_REPO }}', filename='${{ env.MODEL_FILE }}', use_auth_token='${{ secrets.HF_TOKEN }}')"
+        python -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='${{ env.MODEL_NAME }}', token='${{ secrets.HF_TOKEN }}')"
 
     - name: Convert Python to C#
       env:
@@ -79,10 +78,11 @@ jobs:
           python - <<EOF
         from transformers import AutoTokenizer, AutoModelForCausalLM
         import torch
-        model_name = "${{ env.MODEL_REPO }}"
-        model_file = "${{ env.MODEL_FILE }}"
+
+        model_name = "${{ env.MODEL_NAME }}"
         tokenizer = AutoTokenizer.from_pretrained(model_name, token="${{ secrets.HF_TOKEN }}")
-        model = AutoModelForCausalLM.from_pretrained(model_file, token="${{ secrets.HF_TOKEN }}")
+        model = AutoModelForCausalLM.from_pretrained(model_name, token="${{ secrets.HF_TOKEN }}")
+
         prompt = f"Convert the following Python code to C#:\n\n{python_code}\n\nC# code:"
         input_ids = tokenizer.encode(prompt, return_tensors="pt")
         
