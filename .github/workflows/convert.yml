@@ -24,11 +24,9 @@ jobs:
       run: |
         echo "📜 Retrieving commit message for SHA: ${{ github.sha }}"
         COMMIT_MESSAGE=$(git log --format=%B -n 1 "${{ github.sha }}")
-        {
-          echo "COMMIT_MESSAGE<<EOF"
-          echo "$COMMIT_MESSAGE"
-          echo "EOF"
-        } >> "$GITHUB_ENV"
+        echo "COMMIT_MESSAGE<<EOF" >> $GITHUB_ENV
+        echo "$COMMIT_MESSAGE" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
         echo "✅ Commit message retrieved and stored in environment variable"
 
     - name: Set up Python
@@ -79,7 +77,7 @@ jobs:
         echo "📥 Downloading Mistral-7B-Instruct-v0.3 model..."
         HF_TOKEN="$HF_TOKEN" ilab model download --repository=${{ env.MODEL_NAME }} --filename=Mistral-7B-Instruct-v0.3.Q4_K_M.gguf
         echo "✅ Model downloaded successfully"
-        echo "MODEL_DOWNLOADED=true" >> "$GITHUB_ENV"
+        echo "MODEL_DOWNLOADED=true" >> $GITHUB_ENV
 
     - name: Start InstructLab server and convert Python to C#
       if: env.MODEL_DOWNLOADED == 'true'
@@ -88,19 +86,19 @@ jobs:
         mkfifo serverpipe
 
         # Start the server in the background, redirecting output to the pipe
-        ilab serve > serverpipe 2>&1 &
+        ilab model serve > serverpipe 2>&1 &
         SERVER_PID=$!
 
         # Wait for the server to start (look for a specific message in the output)
         while read line; do
           echo "$line"
-          if [[ $line == *"Server started successfully"* ]]; then
+          if [[ $line == *"Starting server process"* ]]; then
             break
           fi
         done < serverpipe &
 
         # Give the server a moment to fully initialize
-        sleep 10
+        sleep 30
 
         # Perform the conversion
         mkdir -p converted_files
@@ -109,10 +107,15 @@ jobs:
           python_code=$(cat "$file")
           output_file="converted_files/$(basename "${file%.py}.cs")"
           
-          csharp_code=$(ilab chat --prompt "Convert the following Python code to C#:
-        Python code:
-        $python_code
-        C# code:")
+          csharp_code=$(ilab model chat -qq <<EOF
+Convert the following Python code to C#:
+
+Python code:
+$python_code
+
+C# code:
+EOF
+)
           
           echo "$csharp_code" > "$output_file"
           echo "Converted $file to $output_file"
