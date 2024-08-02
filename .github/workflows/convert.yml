@@ -42,3 +42,14 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
+
+    - name: Print content of changed file
+      run: |
+        echo "📄 Printing content of changed file(s):"
+        git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep '\.py$' | while read file; do
+          echo "File: $file"
+          echo "=========================="
+          cat "$file"
+          echo "=========================="
+          echo ""
+        done
