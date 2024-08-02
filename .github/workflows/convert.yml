@@ -8,7 +8,8 @@ on:
 
 env:
   PYTHON_VERSION: '3.10'
-  MODEL_NAME: 'lmstudio-community/Mistral-7B-Instruct-v0.3-GGUF'
+  MODEL_REPO: 'lmstudio-community/Mistral-7B-Instruct-v0.3-GGUF'
+  MODEL_FILE: 'Mistral-7B-Instruct-v0.3.Q4_K_M.gguf'
 
 jobs:
   convert_and_pr:
@@ -58,11 +59,11 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install transformers torch sentencepiece
+        pip install transformers torch sentencepiece huggingface_hub
 
-    - name: Download Mistral 7B v0.3 model
+    - name: Download Mistral 7B v0.3 model file
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: |
-        python -c "from transformers import AutoTokenizer, AutoModelForCausalLM; tokenizer = AutoTokenizer.from_pretrained('${{ env.MODEL_NAME }}', token='${{ secrets.HF_TOKEN }}'); model = AutoModelForCausalLM.from_pretrained('${{ env.MODEL_NAME }}', token='${{ secrets.HF_TOKEN }}')"
-        echo "✅ Model downloaded successfully"
+        python -c "from huggingface_hub import hf_hub_download; hf_hub_download(repo_id='${{ env.MODEL_REPO }}', filename='${{ env.MODEL_FILE }}', use_auth_token='${{ secrets.HF_TOKEN }}')"
+        echo "✅ Model file downloaded"
