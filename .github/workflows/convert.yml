@@ -61,5 +61,8 @@ jobs:
         pip install transformers torch sentencepiece
 
     - name: Download Mistral 7B v0.3 model
+      env:
+        HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: |
-        python -c "from transformers import AutoTokenizer, AutoModelForCausalLM; tokenizer = AutoTokenizer.from_pretrained('${{ env.MODEL_NAME }}'); model = AutoModelForCausalLM.from_pretrained('${{ env.MODEL_NAME }}')"
+        python -c "from transformers import AutoTokenizer, AutoModelForCausalLM; tokenizer = AutoTokenizer.from_pretrained('${{ env.MODEL_NAME }}', use_auth_token='${{ secrets.HF_TOKEN }}'); model = AutoModelForCausalLM.from_pretrained('${{ env.MODEL_NAME }}', use_auth_token='${{ secrets.HF_TOKEN }}')"
+        echo "✅ Model downloaded successfully"
