@@ -63,14 +63,6 @@ jobs:
         pip list
         echo "📦 Above is the list of installed packages"
 
-    - name: Clone and copy config.yaml
-      run: |
-        echo "🔄 Cloning config repository and copying config.yaml..."
-        git clone "https://github.com/nicklamb97/instructlab-config.git" temp_config
-        cp temp_config/config.yaml "$GITHUB_WORKSPACE/config.yaml"
-        rm -rf temp_config
-        echo "✅ config.yaml copied to root directory: $GITHUB_WORKSPACE/config.yaml"
-
     - name: Download model
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
@@ -84,7 +76,7 @@ jobs:
       if: env.MODEL_DOWNLOADED == 'true'
       run: |
         echo "🚀 Starting InstructLab server..."
-        ilab model serve &
+        ilab model serve --config config.yaml &
         SERVER_PID=$!
         echo "📝 Server PID: $SERVER_PID"
 
