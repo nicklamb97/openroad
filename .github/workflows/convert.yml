@@ -8,8 +8,8 @@ on:
 
 env:
   PYTHON_VERSION: '3.10'
-  MODEL_NAME: 'lmstudio-community/gemma-2-2b-it-GGUF'
-  MODEL_FILE: 'gemma-2-2b-it-Q4_K_M.gguf'
+  MODEL_NAME: 'NickLamb/Mistral-7B-Instruct-v0.3'
+  MODEL_FILE: 'Mistral-7B-Instruct-v0.3.Q4_K_M.gguf'
 
 jobs:
   convert_and_pr:
