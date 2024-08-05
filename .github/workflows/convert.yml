@@ -57,7 +57,7 @@ jobs:
       run: |
         echo "🔧 Installing required Python packages..."
         python -m pip install --upgrade pip
-        pip install instructlab gitpython requests
+        pip install instructlab gitpython
         echo "✅ Dependencies installed successfully"
         pip list
         echo "📦 Above is the list of installed packages"
@@ -83,8 +83,7 @@ jobs:
       if: env.MODEL_DOWNLOADED == 'true'
       run: |
         echo "🚀 Starting InstructLab server..."
-        mkfifo serverpipe
-        ilab model serve > serverpipe 2>&1 &
+        ilab model serve &
         SERVER_PID=$!
         echo "📝 Server PID: $SERVER_PID"
 
@@ -102,16 +101,9 @@ jobs:
           python_code=$(cat "$file")
           output_file="converted_files/$(basename "${file%.py}.cs")"
           
-          echo "🌐 Sending request to local server for conversion..."
-          csharp_code=$(curl -s -X POST http://localhost:8000/v1/chat/completions \
-            -H "Content-Type: application/json" \
-            -d '{
-              "model": "Mistral-7B-Instruct-v0.3",
-              "messages": [
-                {"role": "system", "content": "You are a helpful assistant that converts Python code to C#."},
-                {"role": "user", "content": "Convert the following Python code to C#:\n\n'"$python_code"'"}
-              ]
-            }' | jq -r '.choices[0].message.content')
+          echo "🌐 Using ilab model chat for conversion..."
+          prompt=$(sed "s/\${python_code}/$python_code/" convert_prompt.txt)
+          csharp_code=$(echo "$prompt" | ilab model chat -qq)
           
           echo "💾 Saving converted code to $output_file"
           echo "$csharp_code" > "$output_file"
@@ -127,10 +119,6 @@ jobs:
         kill $SERVER_PID || echo "Failed to kill server process"
         wait $SERVER_PID || echo "Error while waiting for server process to end"
         echo "✅ Server stopped"
-
-        echo "🧹 Cleaning up named pipe..."
-        rm serverpipe || echo "Failed to remove named pipe"
-        echo "✅ Named pipe removed"
 
     - name: Checkout C# repo
       uses: actions/checkout@v3
