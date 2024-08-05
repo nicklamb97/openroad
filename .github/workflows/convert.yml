@@ -76,7 +76,7 @@ jobs:
       if: env.MODEL_DOWNLOADED == 'true'
       run: |
         echo "🚀 Starting InstructLab server..."
-        ilab model serve --config config.yaml &
+        ilab model serve &
         SERVER_PID=$!
         echo "📝 Server PID: $SERVER_PID"
 
