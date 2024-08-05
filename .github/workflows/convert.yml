@@ -102,7 +102,7 @@ jobs:
           echo "$prompt"
           echo "============================"
           
-          csharp_code=$(echo "$prompt" | ilab model chat -qq)
+          csharp_code=$(ilab model chat -qq "$prompt")
           
           echo "💾 Saving converted code to $output_file"
           echo "$csharp_code" > "$output_file"
