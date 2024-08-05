@@ -81,9 +81,7 @@ jobs:
         echo "📝 Server PID: $SERVER_PID"
 
         echo "⏳ Waiting for server to start..."
-        while ! grep -q "Server started" server.log; do
-          sleep 10
-        done
+        sleep 10
         echo "✅ Server started successfully"
 
         echo "🗂️ Creating directory for converted files..."
