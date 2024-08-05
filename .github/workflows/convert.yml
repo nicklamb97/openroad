@@ -124,16 +124,17 @@ jobs:
       with:
         repository: nicklamb97/csharp
         path: csharp_repo
-        token: ${{ secrets.PAT_TOKEN }}
 
     - name: Copy converted files and create PR
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         echo "📁 Copying converted files to C# repository..."
         cp -r converted_files/* csharp_repo/
         cd csharp_repo
         echo "🔧 Configuring git..."
         git config user.name "GitHub Actions Bot"
-        git config user.email "<>"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
         echo "➕ Adding changes to git..."
         git add .
         echo "📝 Committing changes..."
@@ -142,14 +143,9 @@ jobs:
         git push origin HEAD:auto-convert-python-to-csharp
         
         echo "🔗 Creating pull request..."
-        PR_URL=$(curl -X POST -H "Authorization: token ${{ secrets.PAT_TOKEN }}" \
-             -H "Accept: application/vnd.github.v3+json" \
-             https://api.github.com/repos/nicklamb97/csharp/pulls \
-             -d "{
-               \"title\": \"Automated Python to C# Conversion\",
-               \"body\": \"This PR contains automatically converted C# code based on the following commit:\\n\\n${{ env.COMMIT_MESSAGE }}\\n\\nPlease review the converted code and merge if appropriate.\",
-               \"head\": \"auto-convert-python-to-csharp\",
-               \"base\": \"main\"
-             }" | jq -r .html_url)
+        PR_URL=$(gh pr create --title "Automated Python to C# Conversion" \
+                              --body "This PR contains automatically converted C# code based on the following commit: ${{ env.COMMIT_MESSAGE }}" \
+                              --base main \
+                              --head auto-convert-python-to-csharp)
         
         echo "✅ Pull request created: $PR_URL"
