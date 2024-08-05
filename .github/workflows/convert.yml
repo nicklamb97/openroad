@@ -127,25 +127,30 @@ jobs:
 
     - name: Copy converted files and create PR
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GENERATED_REPO_TOKEN }}
       run: |
         echo "📁 Copying converted files to C# repository..."
         cp -r converted_files/* csharp_repo/
         cd csharp_repo
         echo "🔧 Configuring git..."
-        git config user.name "GitHub Actions Bot"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git config user.name "Nick Lamb"
+        git config user.email "nick.lamb@diegesis.co.uk"
         echo "➕ Adding changes to git..."
         git add .
         echo "📝 Committing changes..."
         git commit -m "Convert Python to C#: ${{ env.COMMIT_MESSAGE }}"
         echo "🚀 Pushing changes to remote branch..."
-        git push origin HEAD:auto-convert-python-to-csharp
+        git push "https://$GITHUB_TOKEN@github.com/nicklamb97/csharp.git" HEAD:auto-convert-python-to-csharp
         
         echo "🔗 Creating pull request..."
-        PR_URL=$(gh pr create --title "Automated Python to C# Conversion" \
-                              --body "This PR contains automatically converted C# code based on the following commit: ${{ env.COMMIT_MESSAGE }}" \
-                              --base main \
-                              --head auto-convert-python-to-csharp)
+        PR_URL=$(curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
+             -H "Accept: application/vnd.github.v3+json" \
+             https://api.github.com/repos/nicklamb97/csharp/pulls \
+             -d "{
+               \"title\": \"Automated Python to C# Conversion\",
+               \"body\": \"This PR contains automatically converted C# code based on the following commit:\\n\\n${{ env.COMMIT_MESSAGE }}\\n\\nPlease review the converted code and merge if appropriate.\",
+               \"head\": \"auto-convert-python-to-csharp\",
+               \"base\": \"main\"
+             }" | jq -r .html_url)
         
         echo "✅ Pull request created: $PR_URL"
