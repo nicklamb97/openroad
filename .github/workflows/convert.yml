@@ -8,7 +8,8 @@ on:
 
 env:
   PYTHON_VERSION: '3.10'
-  MODEL_NAME: 'NickLamb/Mistral-7B-Instruct-v0.3'
+  MODEL_NAME: 'lmstudio-community/gemma-2-2b-it-GGUF'
+  MODEL_FILE: 'gemma-2-2b-it-Q4_K_M.gguf'
 
 jobs:
   convert_and_pr:
@@ -74,8 +75,8 @@ jobs:
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: |
-        echo "📥 Downloading Mistral-7B-Instruct-v0.3 model..."
-        HF_TOKEN="$HF_TOKEN" ilab model download --repository=${{ env.MODEL_NAME }} --filename=Mistral-7B-Instruct-v0.3.Q4_K_M.gguf
+        echo "📥 Downloading ${{ env.MODEL_FILE }} model..."
+        HF_TOKEN="$HF_TOKEN" ilab model download --repository=${{ env.MODEL_NAME }} --filename=${{ env.MODEL_FILE }}
         echo "✅ Model downloaded successfully"
         echo "MODEL_DOWNLOADED=true" >> $GITHUB_ENV
 
