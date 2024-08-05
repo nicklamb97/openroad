@@ -114,11 +114,6 @@ jobs:
           echo "============================"
         done
 
-        echo "🛑 Stopping InstructLab server..."
-        kill $SERVER_PID || echo "Failed to kill server process"
-        wait $SERVER_PID || echo "Error while waiting for server process to end"
-        echo "✅ Server stopped"
-
     - name: Checkout C# repo
       uses: actions/checkout@v3
       with:
