@@ -76,13 +76,15 @@ jobs:
       if: env.MODEL_DOWNLOADED == 'true'
       run: |
         echo "🚀 Starting InstructLab server..."
-        ilab model serve &
+        nohup ilab model serve > server.log 2>&1 &
         SERVER_PID=$!
         echo "📝 Server PID: $SERVER_PID"
 
-        echo "⏳ Waiting for 10 seconds to allow server to start..."
-        sleep 10
-        echo "✅ Wait complete. Proceeding with conversion."
+        echo "⏳ Waiting for server to start..."
+        while ! grep -q "Server started" server.log; do
+          sleep 10
+        done
+        echo "✅ Server started successfully"
 
         echo "🗂️ Creating directory for converted files..."
         mkdir -p converted_files
