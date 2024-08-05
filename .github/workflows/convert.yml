@@ -116,15 +116,20 @@ jobs:
           echo "💾 Saving converted code to $output_file"
           echo "$csharp_code" > "$output_file"
           echo "✅ Converted $file to $output_file"
+          
+          echo "📄 Printing generated C# code:"
+          echo "============================"
+          cat "$output_file"
+          echo "============================"
         done
 
         echo "🛑 Stopping InstructLab server..."
-        kill $SERVER_PID
-        wait $SERVER_PID
+        kill $SERVER_PID || echo "Failed to kill server process"
+        wait $SERVER_PID || echo "Error while waiting for server process to end"
         echo "✅ Server stopped"
 
         echo "🧹 Cleaning up named pipe..."
-        rm serverpipe
+        rm serverpipe || echo "Failed to remove named pipe"
         echo "✅ Named pipe removed"
 
     - name: Checkout C# repo
