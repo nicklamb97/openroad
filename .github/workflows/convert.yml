@@ -82,14 +82,9 @@ jobs:
     - name: Start InstructLab server and convert Python to C#
       if: env.MODEL_DOWNLOADED == 'true'
       run: |
-        # Create a named pipe for communication
         mkfifo serverpipe
-
-        # Start the server in the background, redirecting output to the pipe
         ilab model serve > serverpipe 2>&1 &
         SERVER_PID=$!
-
-        # Function to check if server is ready
         check_server_ready() {
           for i in {1..60}; do
             if curl -s http://localhost:8000/v1/models >/dev/null; then
@@ -100,7 +95,6 @@ jobs:
           return 1
         }
 
-        # Wait for the server to start
         if check_server_ready; then
           echo "Server is ready"
         else
@@ -109,7 +103,6 @@ jobs:
           exit 1
         fi
 
-        # Perform the conversion
         mkdir -p converted_files
         git diff-tree --no-commit-id --name-only -r ${{ github.sha }} | grep '\.py$' | while read file; do
           echo "Converting $file to C#"
@@ -130,11 +123,9 @@ jobs:
           echo "Converted $file to $output_file"
         done
 
-        # Stop the server
         kill $SERVER_PID
         wait $SERVER_PID
 
-        # Clean up the named pipe
         rm serverpipe
 
     - name: Checkout C# repo
