@@ -57,7 +57,7 @@ jobs:
       run: |
         echo "🔧 Installing required Python packages..."
         python -m pip install --upgrade pip
-        pip install instructlab gitpython
+        pip install instructlab gitpython requests
         echo "✅ Dependencies installed successfully"
         pip list
         echo "📦 Above is the list of installed packages"
@@ -89,16 +89,25 @@ jobs:
         ilab model serve > serverpipe 2>&1 &
         SERVER_PID=$!
 
-        # Wait for the server to start (look for a specific message in the output)
-        while read line; do
-          echo "$line"
-          if [[ $line == *"Starting server process"* ]]; then
-            break
-          fi
-        done < serverpipe &
+        # Function to check if server is ready
+        check_server_ready() {
+          for i in {1..60}; do
+            if curl -s http://localhost:8000/v1/models >/dev/null; then
+              return 0
+            fi
+            sleep 5
+          done
+          return 1
+        }
 
-        # Give the server a moment to fully initialize
-        sleep 30
+        # Wait for the server to start
+        if check_server_ready; then
+          echo "Server is ready"
+        else
+          echo "Server failed to start within the timeout period"
+          kill $SERVER_PID
+          exit 1
+        fi
 
         # Perform the conversion
         mkdir -p converted_files
@@ -107,15 +116,15 @@ jobs:
           python_code=$(cat "$file")
           output_file="converted_files/$(basename "${file%.py}.cs")"
           
-          csharp_code=$(ilab model chat -qq <<EOF
-          Convert the following Python code to C#:
-
-          Python code:
-          $python_code
-
-          C# code:
-          EOF
-          )
+          csharp_code=$(curl -s -X POST http://localhost:8000/v1/chat/completions \
+            -H "Content-Type: application/json" \
+            -d '{
+              "model": "Mistral-7B-Instruct-v0.3",
+              "messages": [
+                {"role": "system", "content": "You are a helpful assistant that converts Python code to C#."},
+                {"role": "user", "content": "Convert the following Python code to C#:\n\n'"$python_code"'"}
+              ]
+            }' | jq -r '.choices[0].message.content')
                     
           echo "$csharp_code" > "$output_file"
           echo "Converted $file to $output_file"
