@@ -84,6 +84,12 @@ jobs:
         sleep 20  # Increased wait time for server startup
         echo "✅ Server started successfully"
 
+    - name: Print InstructLab server logs
+      run: |
+        echo "📝 Printing InstructLab server logs:"
+        cat server.log
+
+
     - name: Initialize and run RAG system
       if: env.MODEL_DOWNLOADED == 'true'
       run: |
