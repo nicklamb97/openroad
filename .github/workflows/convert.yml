@@ -5,6 +5,8 @@ on:
     branches: [ main ]
     paths:
       - '**.py'  # This will only trigger on .py file changes
+    paths-ignore:
+      - 'rag_system.py'  # This will ignore changes to rag_system.py
 
 env:
   PYTHON_VERSION: '3.10'
