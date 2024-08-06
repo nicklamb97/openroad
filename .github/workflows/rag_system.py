@@ -10,7 +10,7 @@ from pypdf import PdfMerger
 import requests
 
 # Setup Logging
-logging.basicConfig(level=logging.INFO) 
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Initialize clients and models
