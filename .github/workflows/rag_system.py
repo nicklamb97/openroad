@@ -21,7 +21,7 @@ embedding_model = SentenceTransformer("BAAI/bge-small-en-v1.5")
 llm_client = InferenceClient(model="mistralai/Mistral-Nemo-Instruct-2407", timeout=120)
 
 # Constants
-HF_TOKEN = os.getenv("HF_TOKEN")
+HF_TOKEN = "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"
 FAISS_INDEX_FILE = ".github/workflows/faiss_index.pkl"
 MASTER_PDF = ".github/workflows/OpenROAD_Doc/OpenROAD_Master_Document.pdf"
 OPENROAD_DOC = ".github/workflows/OpenROAD_Doc"
