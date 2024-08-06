@@ -69,6 +69,7 @@ def get_rag_response(question, top_k=5):
         f"{MODEL_SERVER_URL}/generate",
         json={"prompt": prompt, "max_new_tokens": 1000}
     )
+    print(response)
     
     if response.status_code == 200:
         answer = response.json().get("generated_text", "").strip()
