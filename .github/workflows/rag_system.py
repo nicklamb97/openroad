@@ -3,7 +3,7 @@ from huggingface_hub import InferenceClient
 import os
 from langchain_community.document_loaders import PyPDFLoader
 from sentence_transformers import SentenceTransformer
-from langchain.text_splitters import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
 from tqdm import tqdm
 import pickle
