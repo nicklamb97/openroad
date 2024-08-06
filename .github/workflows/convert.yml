@@ -88,8 +88,8 @@ jobs:
       run: |
         echo "📝 Printing InstructLab server logs:"
         cat server.log
-        curl -X POST http://localhost:8000/generate -H "Content-Type: application/json" -d '{"question": "What is the capital of France?"}'
-        sleep 60
+        curl -X POST http://localhost:8000 -H "Content-Type: application/json" -d '{"question": "What is the capital of France?"}'
+        sleep 20
 
 
     - name: Initialize and run RAG system
