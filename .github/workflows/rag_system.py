@@ -97,7 +97,7 @@ def save_index_to_hf_space(index_path):
         )
         logger.info(f"Uploaded {index_path} to Hugging Face Space {space_id}")
     except Exception as e:
-        logger.error(f"Failed to upload index to Hugging Face Space:{str(e)}")
+        logger.error(f"Failed to upload index to Hugging Face Space: {str(e)}")
 
 def initialize_rag_system():
     global vectorstore
@@ -147,3 +147,77 @@ def initialize_rag_system():
         if vectorstore is None:
             raise ValueError("vectorstore is None after initialization")
     except Exception as e:
+        logger.error(f"Error in initialize_rag_system: {str(e)}", exc_info=True)
+        raise
+
+    # Print the current working directory and list its contents
+    cwd = os.getcwd()
+    logger.info(f"Current working directory: {cwd}")
+    logger.info(f"Contents of the working directory: {os.listdir(cwd)}")
+    logger.info(f"Master PDF Path: {os.path.abspath(MASTER_PDF)}")
+
+# Chatbot response function
+def respond(
+    message,
+    history: list[tuple[str, str]],
+    system_message,
+    max_tokens,
+    temperature,
+    top_p,
+    top_k  # Add top_k here
+):
+    # First, get the RAG response with the specified top_k
+    rag_response = get_rag_response(message, top_k)
+    
+    # Prepare messages for the chatbot
+    messages = [{"role": "system", "content": system_message}]
+
+    for val in history:
+        if val[0]:
+            messages.append({"role": "user", "content": val[0]})
+        if val[1]:
+            messages.append({"role": "assistant", "content": val[1]})
+
+    # Add the current message and RAG response
+    messages.append({"role": "user", "content": message})
+    messages.append({"role": "assistant", "content": f"Based on the information I have: {rag_response}"})
+    
+    # Now, let the chatbot generate a response based on the conversation including the RAG response
+    response = ""
+    for message in llm_client.chat_completion(
+        messages,
+        max_tokens=max_tokens,
+        stream=True,
+        temperature=temperature,
+        top_p=top_p,
+    ):
+        token = message.choices[0].delta.content
+        response += token
+        yield response
+
+# Gradio interface
+demo = gr.ChatInterface(
+    respond,
+    additional_inputs=[
+        gr.Textbox(value="You are a helpful assistant. You are proficient in Actian 4GL OpenROAD.", label="System message"),
+        gr.Slider(minimum=1, maximum=128000, value=30000, step=1, label="Max new tokens"),
+        gr.Slider(minimum=0.1, maximum=4.0, value=0.4, step=0.1, label="Temperature"),
+        gr.Slider(
+            minimum=0.1,
+            maximum=1.0,
+            value=0.95,
+            step=0.05,
+            label="Top-p (nucleus sampling)",
+        ),
+        gr.Slider(minimum=1, maximum=20, value=6, step=1, label="Top-k")  # Add top_k slider
+    ],
+)
+
+if __name__ == "__main__":
+    try:
+        # Initialize RAG system
+        initialize_rag_system()
+        # Launch the demo
+        demo.launch()
+    except Exception as e:
+        logger.error(f"Failed to launch the app: {str(e)}", exc_info=True)
