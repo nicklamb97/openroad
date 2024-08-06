@@ -76,7 +76,7 @@ jobs:
       if: env.MODEL_DOWNLOADED == 'true'
       run: |
         echo "🚀 Initializing RAG system..."
-        python rag_system.py
+        python .github/workflows/rag_system.py
         echo "✅ RAG system initialized and running"
 
     - name: Start InstructLab server and convert Python to C#
