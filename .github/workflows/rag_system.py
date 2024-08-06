@@ -97,7 +97,7 @@ def save_index_to_hf_space(index_path):
         )
         logger.info(f"Uploaded {index_path} to Hugging Face Space {space_id}")
     except Exception as e:
-        logger.error(f"Failed to upload index to Hugging Face Space: {str(e)}")
+        logger.error(f"Failed to upload index to Hugging Face Space:{str(e)}")
 
 def initialize_rag_system():
     global vectorstore
