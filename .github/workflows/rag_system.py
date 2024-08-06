@@ -37,7 +37,7 @@ def emb_text(text):
     return embedding_model.encode(text, normalize_embeddings=True)
 
 # Prompt template
-PROMPT = """
+PROMPT =  """
 Use the following pieces of information enclosed in <context> tags to provide an answer to the question enclosed in <question> tags.
 <context>
 {context}
