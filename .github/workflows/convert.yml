@@ -103,9 +103,13 @@ jobs:
           echo "🐍➡️🔷 Converting $file to C#"
           python_code=$(cat "$file")
           output_file="converted_files/$(basename "${file%.py}.cs")"
+          echo "python_code:"
+          echo "$python_code"
           
           echo "🌐 Using ilab model chat for conversion..."
           prompt=$(sed "s/\${python_code}/$python_code/" convert_prompt.txt)
+          echo "prompt:"
+          echo "$prompt"
 
           echo "🚀 Augmenting prompt using RAG system..."
           augmented_prompt=$(python .github/workflows/rag_system.py "$(prompt)")
