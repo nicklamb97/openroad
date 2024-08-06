@@ -17,9 +17,9 @@ embedding_model = SentenceTransformer("BAAI/bge-small-en-v1.5")
 MODEL_SERVER_URL = "http://localhost:8000"  # Replace with actual server URL
 
 # Constants
-FAISS_INDEX_FILE = "./faiss_index.pkl"
-MASTER_PDF = "./OpenROAD_Master_Document.pdf"
-OPENROAD_DOC = "./OpenROAD_Doc"
+FAISS_INDEX_FILE = ".github/workflows/faiss_index.pkl"
+MASTER_PDF = ".github/workflows/OpenROAD_Doc/OpenROAD_Master_Document.pdf"
+OPENROAD_DOC = ".github/workflows/OpenROAD_Doc"
 
 # Global variable for the vector store
 vectorstore = None
