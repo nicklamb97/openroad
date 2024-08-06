@@ -1,11 +1,10 @@
 import os
 import pickle
 import logging
-import requests
 import sys
 from langchain_community.document_loaders import PyPDFLoader
 from sentence_transformers import SentenceTransformer
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain.text_splitters import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
 from tqdm import tqdm
 from pypdf import PdfMerger
@@ -16,7 +15,6 @@ logger = logging.getLogger(__name__)
 
 # Initialize clients and models
 embedding_model = SentenceTransformer("BAAI/bge-small-en-v1.5")
-MODEL_SERVER_URL = "http://localhost:8000"  # Replace with actual server URL
 
 # Constants
 FAISS_INDEX_FILE = ".github/workflows/faiss_index.pkl"
@@ -26,7 +24,7 @@ OPENROAD_DOC = ".github/workflows/OpenROAD_Doc"
 # Global variable for the vector store
 vectorstore = None
 
-# Initialise PDF_FILES list
+# Initialize PDF_FILES list
 PDF_FILES = []
 
 # Functions for RAG system
@@ -45,6 +43,7 @@ Use the following pieces of information enclosed in <context> tags to provide an
 """
 
 def create_pdf_array(directory):
+    global PDF_FILES
     # Iterate through the directory
     for filename in os.listdir(directory):
         # Check if the file is a PDF
@@ -55,7 +54,7 @@ def create_pdf_array(directory):
     # Print the list of PDF files
     print(PDF_FILES)
 
-def get_rag_response(question, top_k=5):
+def get_rag_context(question, top_k=5):
     global vectorstore
     # Embed the question
     question_embedding = emb_text(question)
@@ -63,21 +62,7 @@ def get_rag_response(question, top_k=5):
     docs = vectorstore.similarity_search_by_vector(question_embedding, k=top_k)
     context = "\n".join([doc.page_content for doc in docs])
     
-    prompt = PROMPT.format(context=context, question=question)
-    
-    # Send a request to the model server
-    response = requests.post(
-        f"{MODEL_SERVER_URL}/generate",
-        json={"prompt": prompt, "max_new_tokens": 1000}
-    )
-    print(response)
-    
-    if response.status_code == 200:
-        answer = response.json().get("generated_text", "").strip()
-    else:
-        answer = "Error: Unable to get response from model server."
-
-    return answer
+    return context
 
 def save_index_to_local(index_path):
     try:
@@ -136,35 +121,28 @@ def initialize_rag_system():
         logger.error(f"Error in initialize_rag_system: {str(e)}", exc_info=True)
         raise
 
-# Function for generating responses from the model server
-def generate_response(prompt, max_new_tokens=1000):
-    response = requests.post(
-        f"{MODEL_SERVER_URL}/generate",
-        json={"prompt": prompt, "max_new_tokens": max_new_tokens}
-    )
-    
-    if response.status_code == 200:
-        return response.json().get("generated_text", "").strip()
-    else:
-        return "Error: Unable to get response from model server."
-
-def get_csharp_code(python_code):
-    prompt = f"Convert the following Python code to C#:\n\n{python_code}"
-    return generate_response(prompt)
+def augment_prompt(prompt):
+    try:
+        # Initialize RAG system if not already done
+        initialize_rag_system()
+        # Get context using RAG
+        context = get_rag_context(prompt)
+        # Create augmented prompt
+        augmented_prompt = PROMPT.format(context=context, question=prompt)
+        return augmented_prompt
+    except Exception as e:
+        logger.error(f"Error in augment_prompt: {str(e)}", exc_info=True)
+        return "Error: Unable to augment prompt."
 
 # Example usage
 if __name__ == "__main__":
     try:
         if len(sys.argv) > 1:
             prompt = sys.argv[1]
-            response = get_csharp_code(prompt)
+            response = augment_prompt(prompt)
             print(response)
         else:
             # Initialize RAG system
             initialize_rag_system()
-            # Example call to generate a response
-            example_question = "What is the purpose of the OpenROAD project?"
-            answer = get_rag_response(example_question)
-            print(f"Answer: {answer}")
     except Exception as e:
         logger.error(f"Error during execution: {str(e)}", exc_info=True)
