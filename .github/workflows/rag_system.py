@@ -1,13 +1,14 @@
 import os
 import pickle
 import logging
+import requests
+import sys
 from langchain_community.document_loaders import PyPDFLoader
 from sentence_transformers import SentenceTransformer
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
 from tqdm import tqdm
 from pypdf import PdfMerger
-import requests
 
 # Setup Logging
 logging.basicConfig(level=logging.INFO)
@@ -147,14 +148,23 @@ def generate_response(prompt, max_new_tokens=1000):
     else:
         return "Error: Unable to get response from model server."
 
+def get_csharp_code(python_code):
+    prompt = f"Convert the following Python code to C#:\n\n{python_code}"
+    return generate_response(prompt)
+
 # Example usage
 if __name__ == "__main__":
     try:
-        # Initialize RAG system
-        initialize_rag_system()
-        # Example call to generate a response
-        example_question = "What is the purpose of the OpenROAD project?"
-        answer = get_rag_response(example_question)
-        print(f"Answer: {answer}")
+        if len(sys.argv) > 1:
+            prompt = sys.argv[1]
+            response = get_csharp_code(prompt)
+            print(response)
+        else:
+            # Initialize RAG system
+            initialize_rag_system()
+            # Example call to generate a response
+            example_question = "What is the purpose of the OpenROAD project?"
+            answer = get_rag_response(example_question)
+            print(f"Answer: {answer}")
     except Exception as e:
         logger.error(f"Error during execution: {str(e)}", exc_info=True)
