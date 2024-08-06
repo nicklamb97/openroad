@@ -1,4 +1,3 @@
-import requests
 import os
 import pickle
 import logging
@@ -77,29 +76,14 @@ def get_rag_response(question, top_k=5):
 
     return answer
 
-def save_index_to_hf_space(index_path):
+def save_index_to_local(index_path):
     try:
-        token = os.environ.get("HF_TOKEN")
-        space_id = "connorgilchrist/RAGPOCMilvus"
-
-        if not token:
-            logger.error("HF_TOKEN environment variable is not set. Unable to authenticate.")
-            return
-
-        if not space_id:
-            logger.error("SPACE_ID environment variable is not set. Unable to determine the target Space.")
-            return
-
-        api = HfApi(token=token)
-        api.upload_file(
-            path_or_fileobj=index_path,
-            path_in_repo="faiss_index.pkl",
-            repo_id=space_id,
-            repo_type="space",
-        )
-        logger.info(f"Uploaded {index_path} to Hugging Face Space {space_id}")
+        # Save the FAISS index file to the local directory
+        with open(index_path, "wb") as f:
+            pickle.dump(vectorstore, f)
+        logger.info(f"FAISS index saved locally to {index_path}")
     except Exception as e:
-        logger.error(f"Failed to upload index to Hugging Face Space: {str(e)}")
+        logger.error(f"Failed to save FAISS index locally: {str(e)}")
 
 def initialize_rag_system():
     global vectorstore
@@ -109,7 +93,7 @@ def initialize_rag_system():
             # Remove old master pdf 
             if os.path.exists(MASTER_PDF):
                 os.remove(MASTER_PDF)
-            #Populate PDF_FILES
+            # Populate PDF_FILES
             create_pdf_array(OPENROAD_DOC)
                 
             # Create master pdf doc
@@ -135,10 +119,7 @@ def initialize_rag_system():
             
             # Save the index
             try:
-                with open(FAISS_INDEX_FILE, "wb") as f:
-                    pickle.dump(vectorstore, f)
-                logger.info(f"RAG system initialized and saved to {FAISS_INDEX_FILE}")
-                save_index_to_hf_space(FAISS_INDEX_FILE)
+                save_index_to_local(FAISS_INDEX_FILE)
             except Exception as e:
                 logger.error(f"Failed to save FAISS index: {str(e)}")
         else:
