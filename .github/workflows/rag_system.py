@@ -7,6 +7,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
 from tqdm import tqdm
 from pypdf import PdfMerger
+import requests
 
 # Setup Logging
 logging.basicConfig(level=logging.INFO)
