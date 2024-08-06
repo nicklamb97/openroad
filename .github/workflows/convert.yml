@@ -84,14 +84,6 @@ jobs:
         sleep 20  # Increased wait time for server startup
         echo "✅ Server started successfully"
 
-    - name: Print InstructLab server logs
-      run: |
-        echo "📝 Printing InstructLab server logs:"
-        cat server.log
-        curl -X POST http://localhost:8000/docs -H "Content-Type: application/json" -d '{"question": "What is the capital of France?"}'
-        sleep 20
-
-
     - name: Initialize and run RAG system
       if: env.MODEL_DOWNLOADED == 'true'
       run: |
@@ -120,7 +112,9 @@ jobs:
           echo "$prompt"
           echo "============================"
           
-          csharp_code=$(ilab model chat -qq "$prompt")
+          echo "🌐 Using custom RAG system for conversion..."
+          csharp_code=$(python .github/workflows/rag_system.py "$prompt")
+
           
           echo "💾 Saving converted code to $output_file"
           echo "$csharp_code" > "$output_file"
