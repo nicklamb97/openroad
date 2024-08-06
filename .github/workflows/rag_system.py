@@ -22,9 +22,9 @@ llm_client = InferenceClient(model="mistralai/Mistral-Nemo-Instruct-2407", timeo
 
 # Constants
 HF_TOKEN = os.getenv("HF_TOKEN")
-FAISS_INDEX_FILE = "./faiss_index.pkl"
-MASTER_PDF = "./OpenROAD_Master_Document.pdf"
-OPENROAD_DOC = "./OpenROAD_Doc"
+FAISS_INDEX_FILE = ".github/workflows/faiss_index.pkl"
+MASTER_PDF = ".github/workflows/OpenROAD_Doc/OpenROAD_Master_Document.pdf"
+OPENROAD_DOC = ".github/workflows/OpenROAD_Doc/call-statement-test.pdf"
 
 # Global variable for the vector store
 vectorstore = None
