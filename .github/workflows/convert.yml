@@ -58,7 +58,7 @@ jobs:
       run: |
         echo "🔧 Installing required Python packages..."
         python -m pip install --upgrade pip
-        pip install instructlab gitpython gradio sentence-transformers langchain_community tqdm huggingface_hub pypdf
+        pip install instructlab gitpython gradio sentence_transformers langchain_community tqdm huggingface_hub pypdf langchain faiss-cpu torch transformers langchain_text_splitters
         echo "✅ Dependencies installed successfully"
         pip list
         echo "📦 Above is the list of installed packages"
