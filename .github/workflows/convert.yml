@@ -88,7 +88,7 @@ jobs:
       run: |
         echo "📝 Printing InstructLab server logs:"
         cat server.log
-        curl -X POST http://localhost:8000 -H "Content-Type: application/json" -d '{"question": "What is the capital of France?"}'
+        curl -X POST http://localhost:8000/docs -H "Content-Type: application/json" -d '{"question": "What is the capital of France?"}'
         sleep 20
 
 
