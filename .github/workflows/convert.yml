@@ -20,7 +20,7 @@ jobs:
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
-      
+
     - name: Get commit message
       run: |
         echo "📜 Retrieving commit message for SHA: ${{ github.sha }}"
@@ -58,14 +58,10 @@ jobs:
       run: |
         echo "🔧 Installing required Python packages..."
         python -m pip install --upgrade pip
-        pip install instructlab gitpython
+        pip install instructlab gitpython gradio sentence-transformers langchain_community tqdm huggingface_hub pypdf
         echo "✅ Dependencies installed successfully"
         pip list
         echo "📦 Above is the list of installed packages"
-
-    - name: Install RAG dependencies
-      run: |
-        pip install sentence-transformers langchain-community langchain-text-splitters faiss-cpu tqdm huggingface_hub
 
     - name: Download model
       env:
@@ -76,14 +72,14 @@ jobs:
         echo "✅ Model downloaded successfully"
         echo "MODEL_DOWNLOADED=true" >> $GITHUB_ENV
 
-    - name: Initialize RAG system
+    - name: Initialize and run RAG system
+      if: env.MODEL_DOWNLOADED == 'true'
       run: |
-        python -c "
-        from rag_system import initialize_rag_system
-        initialize_rag_system()
-        "
+        echo "🚀 Initializing RAG system..."
+        python rag_system.py
+        echo "✅ RAG system initialized and running"
 
-    - name: Start InstructLab server and convert Python to C# using RAG
+    - name: Start InstructLab server and convert Python to C#
       if: env.MODEL_DOWNLOADED == 'true'
       run: |
         echo "🚀 Starting InstructLab server..."
@@ -105,24 +101,18 @@ jobs:
           python_code=$(cat "$file")
           output_file="converted_files/$(basename "${file%.py}.cs")"
           
-          echo "🌐 Using RAG-enhanced conversion..."
-          python -c "
-python_code = '''$python_code'''
-rag_context = get_rag_response(f'Convert this Python code to C#: {python_code}')
-prompt = f'''
-Use the following context to help convert this Python code to C#:
-{rag_context}
-
-Python code to convert:
-{python_code}
-
-Please provide the equivalent C# code:
-'''
-csharp_code = ilab.model.chat(prompt)
-with open('$output_file', 'w') as f:
-    f.write(csharp_code)
-          "
+          echo "🌐 Using ilab model chat for conversion..."
+          prompt=$(sed "s/\${python_code}/$python_code/" convert_prompt.txt)
           
+          echo "📄 Printing updated prompt:"
+          echo "============================"
+          echo "$prompt"
+          echo "============================"
+          
+          csharp_code=$(ilab model chat -qq "$prompt")
+          
+          echo "💾 Saving converted code to $output_file"
+          echo "$csharp_code" > "$output_file"
           echo "✅ Converted $file to $output_file"
           
           echo "📄 Printing generated C# code:"
