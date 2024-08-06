@@ -134,12 +134,6 @@ def initialize_rag_system():
         logger.error(f"Error in initialize_rag_system: {str(e)}", exc_info=True)
         raise
 
-    # Print the current working directory and list its contents
-    cwd = os.getcwd()
-    logger.info(f"Current working directory: {cwd}")
-    logger.info(f"Contents of the working directory: {os.listdir(cwd)}")
-    logger.info(f"Master PDF Path: {os.path.abspath(MASTER_PDF)}")
-
 # Function for generating responses from the model server
 def generate_response(prompt, max_new_tokens=1000):
     response = requests.post(
