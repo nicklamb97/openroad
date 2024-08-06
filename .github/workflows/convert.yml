@@ -72,14 +72,7 @@ jobs:
         echo "✅ Model downloaded successfully"
         echo "MODEL_DOWNLOADED=true" >> $GITHUB_ENV
 
-    - name: Initialize and run RAG system
-      if: env.MODEL_DOWNLOADED == 'true'
-      run: |
-        echo "🚀 Initializing RAG system..."
-        python .github/workflows/rag_system.py
-        echo "✅ RAG system initialized and running"
-
-    - name: Start InstructLab server and convert Python to C#
+    - name: Start InstructLab server
       if: env.MODEL_DOWNLOADED == 'true'
       run: |
         echo "🚀 Starting InstructLab server..."
@@ -88,9 +81,19 @@ jobs:
         echo "📝 Server PID: $SERVER_PID"
 
         echo "⏳ Waiting for server to start..."
-        sleep 10
+        sleep 20  # Increased wait time for server startup
         echo "✅ Server started successfully"
 
+    - name: Initialize and run RAG system
+      if: env.MODEL_DOWNLOADED == 'true'
+      run: |
+        echo "🚀 Initializing RAG system..."
+        python .github/workflows/rag_system.py
+        echo "✅ RAG system initialized and running"
+
+    - name: Convert Python to C# and Create PR
+      if: env.MODEL_DOWNLOADED == 'true'
+      run: |
         echo "🗂️ Creating directory for converted files..."
         mkdir -p converted_files
         echo "✅ Directory created: converted_files"
