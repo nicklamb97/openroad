@@ -112,7 +112,7 @@ jobs:
           echo "$prompt"
 
           echo "🚀 Augmenting prompt using RAG system..."
-          augmented_prompt=$(python .github/workflows/rag_system.py "$(prompt)")
+          augmented_prompt=$(python .github/workflows/rag_system.py "$prompt")
           
           echo "📄 Printing updated prompt:"
           echo "============================"
