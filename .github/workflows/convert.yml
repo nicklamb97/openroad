@@ -121,6 +121,7 @@ jobs:
           
           echo "🌐 Using ilab model chat for conversion..."
           csharp_code=$(ilab model chat -qq "$augmented_prompt")
+          echo "$csharp_code"
           
           echo "💾 Saving converted code to $output_file"
           echo "$csharp_code" > "$output_file"
