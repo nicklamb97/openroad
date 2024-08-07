@@ -91,14 +91,6 @@ jobs:
         python .github/workflows/rag_system.py
         echo "✅ RAG system initialized and running"
 
-    - name: Commit FAISS index
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add .github/workflows/faiss_index.pkl
-        git commit -m "Add FAISS index" || echo "No changes to commit"
-        git push
-
     - name: Convert Python to C# and Create PR
       if: env.MODEL_DOWNLOADED == 'true'
       run: |
