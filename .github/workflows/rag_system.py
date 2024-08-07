@@ -143,20 +143,38 @@ if __name__ == "__main__":
             print("""
 Use the following pieces of information enclosed in <context> tags to provide an answer to the question enclosed in <question> tags.
 <context>
-{context}
+call statement.
+If you issue the call statement in a transaction,  the statement commits the transaction  without a 
+warning message before invoking the subsystem.  To ensure data integrity, if a transaction  is open, 
+terminate it before issuing the call statement.
+For more information  about transaction  management,  see How You Can Manage Transactions  in 
+the Programming Guide.
+If your application  is not connected  to a database, the only variant of this statement that you can 
+use is call runimage. For more information  about the call statement variants, see Subsystem  Types 
+on page130.
+Parameters--Call Statement
+This statement has the following parameters:
+subsystem
+Specifies the dynamic name of a specific tool or application.  For a list of valid subsystems,  
+see Subsystem  Types on page130.
 </context>
 <question>
 Convert the following Python code to C#. Do not use markdown, and only return the code itself.
+
 Example:
+
 Python code:
 print("Hello World")
+
 C# code:
 Console.WriteLine("Hello World");
+
 Task:
+
 Python code:
-print("Nick's first Python program") 
+print("Nick's first Python program")
+
 C# code:
-{question}
 </question>
 """)
         else:
