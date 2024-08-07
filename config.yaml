@@ -2,7 +2,7 @@ chat:
   context: default
   greedy_mode: false
   logs_dir: data/chatlogs
-  max_tokens: null
+  max_tokens: 30000
   model: models/Mistral-7B-Instruct-v0.3.Q4_K_M.gguf
   session: null
   vi_mode: false
