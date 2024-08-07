@@ -143,20 +143,24 @@ if __name__ == "__main__":
             print("""
 Use the following pieces of information enclosed in <context> tags to provide an answer to the question enclosed in <question> tags.
 <context>
-call statement.
-If you issue the call statement in a transaction,  the statement commits the transaction  without a 
-warning message before invoking the subsystem.  To ensure data integrity, if a transaction  is open, 
-terminate it before issuing the call statement.
-For more information  about transaction  management,  see How You Can Manage Transactions  in 
-the Programming Guide.
-If your application  is not connected  to a database, the only variant of this statement that you can 
-use is call runimage. For more information  about the call statement variants, see Subsystem  Types 
-on page130.
-Parameters--Call Statement
-This statement has the following parameters:
-subsystem
-Specifies the dynamic name of a specific tool or application.  For a list of valid subsystems,  
-see Subsystem  Types on page130.
+Printing
+As mentioned programming languages have build in methods. Console.WriteLine() is one of them. The statement is quite self explanatory. It tells the computer to write a line to the console. You can change the Hello World to any text you wish as long as the method itself is not changed.
+
+The requirements in the exercises are very precise. For example the line needs to end with a semicolon ;.
+
+Programs are created and read command by command. Every command has to be on their own line. In the next example we are calling Console.WriteLine() twice which means the print command is executed twice.
+
+public class Program {  
+    public static void Main(string[] args) 
+    {  
+        Console.WriteLine("Hello World!");
+        Console.WriteLine("... and Helsinki!"); 
+    }  
+}   
+This would print.
+
+Hello World!
+... and Helsinki!
 </context>
 <question>
 Convert the following Python code to C#. Do not use markdown, and only return the code itself.
