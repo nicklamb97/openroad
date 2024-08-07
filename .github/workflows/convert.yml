@@ -93,6 +93,7 @@ jobs:
 
     - name: Convert Python to C# and Create PR
       if: env.MODEL_DOWNLOADED == 'true'
+      timeout-minutes: 10
       run: |
         echo "🗂️ Creating directory for converted files..."
         mkdir -p converted_files
