@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Initialize clients and models
-embedding_model = SentenceTransformer("BAAI/bge-small-en-v1.5")
+embedding_model = SentenceTransformer("dunzhang/stella_en_400M_v5")
 
 # Constants
 FAISS_INDEX_FILE = ".github/workflows/faiss_index.pkl"
