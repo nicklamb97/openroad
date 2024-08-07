@@ -120,7 +120,7 @@ jobs:
           echo "============================"
           
           echo "🌐 Using ilab model chat for conversion..."
-          csharp_code=$(ilab model chat --max-tokens 30000 --verbose "$augmented_prompt" 2>&1)
+          csharp_code=$(ilab model chat --max-tokens 30000 "$augmented_prompt" 2>&1)
           exit_code=$?
 
           echo "ilab model chat command completed with exit code: $exit_code"
