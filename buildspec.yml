@@ -5,6 +5,7 @@ env:
     PYTHON_VERSION: "3.10"
     MODEL_NAME: "NickLamb/Mistral-7B-Instruct-v0.3"
     MODEL_FILE: "Mistral-7B-Instruct-v0.3.Q4_K_M.gguf"
+    HF_TOKEN: ${HF_TOKEN}
 
 phases:
   install:
@@ -17,3 +18,9 @@ phases:
       - echo "✅ Dependencies installed successfully"
       - pip list
       - echo "📦 Above is the list of installed packages"
+
+  pre_build:
+    commands:
+      - echo "📥 Downloading ${MODEL_FILE} model..."
+      - ilab model download --repository=${MODEL_NAME} --filename=${MODEL_FILE}
+      - echo "✅ Model downloaded successfully"
