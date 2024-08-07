@@ -54,7 +54,7 @@ def create_pdf_array(directory):
     # Print the list of PDF files
     print(PDF_FILES)
 
-def get_rag_context(question, top_k=0):
+def get_rag_context(question, top_k=5):
     global vectorstore
     # Embed the question
     question_embedding = emb_text(question)
@@ -140,7 +140,25 @@ if __name__ == "__main__":
         if len(sys.argv) > 1:
             prompt = sys.argv[1]
             response = augment_prompt(prompt)
-            print(response)
+            print("""
+Use the following pieces of information enclosed in <context> tags to provide an answer to the question enclosed in <question> tags.
+<context>
+{context}
+</context>
+<question>
+Convert the following Python code to C#. Do not use markdown, and only return the code itself.
+Example:
+Python code:
+print("Hello World")
+C# code:
+Console.WriteLine("Hello World");
+Task:
+Python code:
+print("Nick's first Python program") 
+C# code:
+{question}
+</question>
+""")
         else:
             # Initialize RAG system
             initialize_rag_system()
