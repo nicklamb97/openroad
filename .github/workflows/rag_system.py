@@ -54,7 +54,7 @@ def create_pdf_array(directory):
     # Print the list of PDF files
     print(PDF_FILES)
 
-def get_rag_context(question, top_k=5):
+def get_rag_context(question, top_k=1):
     global vectorstore
     # Embed the question
     question_embedding = emb_text(question)
