@@ -19,7 +19,7 @@ embedding_model = SentenceTransformer("BAAI/bge-small-en-v1.5")
 # Constants
 FAISS_INDEX_FILE = ".github/workflows/faiss_index.pkl"
 MASTER_PDF = ".github/workflows/OpenROAD_Doc/OpenROAD_Master_Document.pdf"
-OPENROAD_DOC = ".github/workflows/OpenROAD_Doc"
+OPENROAD_DOC = ".github/workflows/openroad_docs"
 
 # Global variable for the vector store
 vectorstore = None
