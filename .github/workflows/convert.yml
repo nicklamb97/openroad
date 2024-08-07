@@ -120,7 +120,7 @@ jobs:
           echo "============================"
           
           echo "🌐 Using ilab model chat for conversion..."
-          csharp_code=$(timeout 120 ilab model chat --max-tokens 30000 -qq "$augmented_prompt")
+          csharp_code=$(ilab model chat --max-tokens 30000 -qq "$augmented_prompt")
           echo "$csharp_code"
           
           echo "💾 Saving converted code to $output_file"
