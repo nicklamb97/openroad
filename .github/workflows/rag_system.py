@@ -197,42 +197,6 @@ This would print.
 
 Hello World!
 ... and Helsinki!
-Printing
-As mentioned programming languages have build in methods. Console.WriteLine() is one of them. The statement is quite self explanatory. It tells the computer to write a line to the console. You can change the Hello World to any text you wish as long as the method itself is not changed.
-
-The requirements in the exercises are very precise. For example the line needs to end with a semicolon ;.
-
-Programs are created and read command by command. Every command has to be on their own line. In the next example we are calling Console.WriteLine() twice which means the print command is executed twice.
-
-public class Program {  
-    public static void Main(string[] args) 
-    {  
-        Console.WriteLine("Hello World!");
-        Console.WriteLine("... and Helsinki!"); 
-    }  
-}   
-This would print.
-
-Hello World!
-... and Helsinki!
-Printing
-As mentioned programming languages have build in methods. Console.WriteLine() is one of them. The statement is quite self explanatory. It tells the computer to write a line to the console. You can change the Hello World to any text you wish as long as the method itself is not changed.
-
-The requirements in the exercises are very precise. For example the line needs to end with a semicolon ;.
-
-Programs are created and read command by command. Every command has to be on their own line. In the next example we are calling Console.WriteLine() twice which means the print command is executed twice.
-
-public class Program {  
-    public static void Main(string[] args) 
-    {  
-        Console.WriteLine("Hello World!");
-        Console.WriteLine("... and Helsinki!"); 
-    }  
-}   
-This would print.
-
-Hello World!
-... and Helsinki!
 </context>
 <question>
 Convert the following Python code to C#. Do not use markdown, and only return the code itself.
