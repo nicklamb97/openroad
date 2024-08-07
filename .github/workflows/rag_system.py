@@ -140,65 +140,7 @@ if __name__ == "__main__":
         if len(sys.argv) > 1:
             prompt = sys.argv[1]
             response = augment_prompt(prompt)
-            print("""
-Use the following pieces of information enclosed in <context> tags to provide an answer to the question enclosed in <question> tags.
-<context>
-Printing
-As mentioned programming languages have build in methods. Console.WriteLine() is one of them. The statement is quite self explanatory. It tells the computer to write a line to the console. You can change the Hello World to any text you wish as long as the method itself is not changed.
-
-The requirements in the exercises are very precise. For example the line needs to end with a semicolon ;.
-
-Programs are created and read command by command. Every command has to be on their own line. In the next example we are calling Console.WriteLine() twice which means the print command is executed twice.
-
-public class Program {  
-    public static void Main(string[] args) 
-    {  
-        Console.WriteLine("Hello World!");
-        Console.WriteLine("... and Helsinki!"); 
-    }  
-}   
-This would print.
-
-Hello World!
-... and Helsinki!
-Printing
-As mentioned programming languages have build in methods. Console.WriteLine() is one of them. The statement is quite self explanatory. It tells the computer to write a line to the console. You can change the Hello World to any text you wish as long as the method itself is not changed.
-
-The requirements in the exercises are very precise. For example the line needs to end with a semicolon ;.
-
-Programs are created and read command by command. Every command has to be on their own line. In the next example we are calling Console.WriteLine() twice which means the print command is executed twice.
-
-public class Program {  
-    public static void Main(string[] args) 
-    {  
-        Console.WriteLine("Hello World!");
-        Console.WriteLine("... and Helsinki!"); 
-    }  
-}   
-This would print.
-
-Hello World!
-... and Helsinki!
-</context>
-<question>
-Convert the following Python code to C#. Do not use markdown, and only return the code itself.
-
-Example:
-
-Python code:
-print("Hello World")
-
-C# code:
-Console.WriteLine("Hello World");
-
-Task:
-
-Python code:
-print("Nick's first Python program")
-
-C# code:
-</question>
-""")
+            print(response)
         else:
             # Initialize RAG system
             initialize_rag_system()
