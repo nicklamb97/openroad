@@ -22,5 +22,5 @@ generate:
 serve:
   gpu_layers: -1
   host_port: 127.0.0.1:8000
-  max_ctx_size: 4096
+  max_ctx_size: 30000
   model_path: models/Mistral-7B-Instruct-v0.3.Q4_K_M.gguf
