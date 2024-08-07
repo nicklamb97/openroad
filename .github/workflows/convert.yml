@@ -93,7 +93,6 @@ jobs:
 
     - name: Convert Python to C# and Create PR
       if: env.MODEL_DOWNLOADED == 'true'
-      timeout-minutes: 10
       run: |
         echo "🗂️ Creating directory for converted files..."
         mkdir -p converted_files
@@ -122,6 +121,9 @@ jobs:
           
           echo "🌐 Using ilab model chat for conversion..."
           csharp_code=$(ilab model chat --max-tokens 30000 -qq "$augmented_prompt")
+          exit_code=$?
+
+          echo "ilab model chat command completed with exit code: $exit_code"
           echo "$csharp_code"
           
           echo "💾 Saving converted code to $output_file"
