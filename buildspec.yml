@@ -1,0 +1,19 @@
+version: 0.2
+
+env:
+  variables:
+    PYTHON_VERSION: "3.10"
+    MODEL_NAME: "NickLamb/Mistral-7B-Instruct-v0.3"
+    MODEL_FILE: "Mistral-7B-Instruct-v0.3.Q4_K_M.gguf"
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.10
+    commands:
+      - echo "🔧 Installing required Python packages..."
+      - pip install --upgrade pip
+      - pip install instructlab gitpython gradio sentence_transformers langchain_community tqdm huggingface_hub pypdf langchain faiss-cpu torch transformers langchain_text_splitters
+      - echo "✅ Dependencies installed successfully"
+      - pip list
+      - echo "📦 Above is the list of installed packages"
