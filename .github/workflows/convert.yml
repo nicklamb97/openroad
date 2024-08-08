@@ -159,6 +159,7 @@ jobs:
         
         echo "📋 Copying converted files..."
         cp -r ../converted_files/* .
+        cp "../.github/workflows/faiss_index.pkl" .
         git add .
         
         echo "💾 Committing changes..."
