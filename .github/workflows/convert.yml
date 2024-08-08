@@ -167,7 +167,7 @@ jobs:
         
         echo "📋 Copying converted files..."
         cp -r ../converted_files/* .
-        git lfs track "../.github/workflows/faiss_index.pkl" .
+        git lfs track "faiss_index.pkl" .
         git add .
         
         echo "💾 Committing changes..."
