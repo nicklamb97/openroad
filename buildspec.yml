@@ -37,5 +37,5 @@ phases:
     commands:
       - echo "🗂️ Creating directory for converted files..."
       - mkdir -p converted_files
-      - echo "✅ Directory created: converted_files"
+      - echo "✅ Directory created - converted_files"
       - echo "🔍 Finding changed Python files..."
