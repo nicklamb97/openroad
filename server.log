@@ -1,0 +1,54 @@
+nohup: ignoring input
+INFO 2024-08-07 10:40:16,872 serve.py:51: serve Using model 'models/Mistral-7B-Instruct-v0.3.Q4_K_M.gguf' with -1 gpu-layers and 4096 max context size.
+ERROR 2024-08-07 10:40:16,911 llama_cpp:0: flush Traceback (most recent call last):
+  File "/home/git/projects/instructlab-poc/venv/lib/python3.10/site-packages/instructlab/server.py", line 177, in server
+    app = create_app(settings=settings)
+  File "/home/git/projects/instructlab-poc/venv/lib/python3.10/site-packages/llama_cpp/server/app.py", line 147, in create_app
+    set_llama_proxy(model_settings=model_settings)
+  File "/home/git/projects/instructlab-poc/venv/lib/python3.10/site-packages/llama_cpp/server/app.py", line 68, in set_llama_proxy
+    _llama_proxy = LlamaProxy(models=model_settings)
+  File "/home/git/projects/instructlab-poc/venv/lib/python3.10/site-packages/llama_cpp/server/model.py", line 31, in __init__
+    self._current_model = self.load_llama_from_model_settings(
+  File "/home/git/projects/instructlab-poc/venv/lib/python3.10/site-packages/llama_cpp/server/model.py", line 217, in load_llama_from_model_settings
+    _model = create_fn(
+  File "/home/git/projects/instructlab-poc/venv/lib/python3.10/site-packages/llama_cpp/llama.py", line 336, in __init__
+    raise ValueError(f"Model path does not exist: {model_path}")
+ValueError: Model path does not exist: models/Mistral-7B-Instruct-v0.3.Q4_K_M.gguf
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/git/projects/instructlab-poc/venv/lib/python3.10/site-packages/instructlab/model/serve.py", line 58, in serve
+    server(
+  File "/home/git/projects/instructlab-poc/venv/lib/python3.10/site-packages/instructlab/server.py", line 190, in server
+    raise ServerException(f"failed creating the server application: {exc}") from exc
+instructlab.server.ServerException: failed creating the server application: Model path does not exist: models/Mistral-7B-Instruct-v0.3.Q4_K_M.gguf
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/git/projects/instructlab-poc/venv/bin/ilab", line 8, in <module>
+    sys.exit(ilab())
+  File "/home/git/projects/instructlab-poc/venv/lib/python3.10/site-packages/click/core.py", line 1157, in __call__
+    return self.main(*args, **kwargs)
+  File "/home/git/projects/instructlab-poc/venv/lib/python3.10/site-packages/click/core.py", line 1078, in main
+    rv = self.invoke(ctx)
+  File "/home/git/projects/instructlab-poc/venv/lib/python3.10/site-packages/click/core.py", line 1688, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/git/projects/instructlab-poc/venv/lib/python3.10/site-packages/click/core.py", line 1688, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/git/projects/instructlab-poc/venv/lib/python3.10/site-packages/click/core.py", line 1434, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/home/git/projects/instructlab-poc/venv/lib/python3.10/site-packages/click/core.py", line 783, in invoke
+    return __callback(*args, **kwargs)
+  File "/home/git/projects/instructlab-poc/venv/lib/python3.10/site-packages/click/decorators.py", line 33, in new_func
+    return f(get_current_context(), *args, **kwargs)
+  File "/home/git/projects/instructlab-poc/venv/lib/python3.10/site-packages/instructlab/model/serve.py", line 69, in serve
+    click.secho(f"Error creating server: {exc}", fg="red")
+  File "/home/git/projects/instructlab-poc/venv/lib/python3.10/site-packages/click/termui.py", line 634, in secho
+    return echo(message, file=file, nl=nl, err=err, color=color)
+  File "/home/git/projects/instructlab-poc/venv/lib/python3.10/site-packages/click/utils.py", line 318, in echo
+    file.write(out)  # type: ignore
+  File "/home/git/projects/instructlab-poc/venv/lib/python3.10/site-packages/click/_compat.py", line 99, in __getattr__
+    return getattr(self._stream, name)
+AttributeError: 'str' object has no attribute 'write'
