@@ -5,9 +5,10 @@ import sys
 from langchain_community.document_loaders import PyPDFLoader
 from sentence_transformers import SentenceTransformer
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS
 from tqdm import tqdm
 from pypdf import PdfMerger
+import git
 
 # Setup Logging
 logging.basicConfig(level=logging.INFO)
@@ -108,6 +109,7 @@ def initialize_rag_system():
             # Save the index
             try:
                 save_index_to_local(FAISS_INDEX_FILE)
+                commit_faiss_index()
             except Exception as e:
                 logger.error(f"Failed to save FAISS index: {str(e)}")
         else:
@@ -134,7 +136,17 @@ def augment_prompt(prompt):
         logger.error(f"Error in augment_prompt: {str(e)}", exc_info=True)
         return "Error: Unable to augment prompt."
 
-# Example usage
+def commit_faiss_index():
+    try:
+        # Initialize Git repo
+        repo = git.Repo(".")
+        repo.git.add(FAISS_INDEX_FILE)
+        repo.git.commit("-m", "Update FAISS index file")
+        repo.git.push()
+        logger.info("FAISS index file committed to the repository.")
+    except Exception as e:
+        logger.error(f"Failed to commit FAISS index file: {str(e)}")
+
 if __name__ == "__main__":
     try:
         if len(sys.argv) > 1:
