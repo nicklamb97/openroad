@@ -5,10 +5,9 @@ import sys
 from langchain_community.document_loaders import PyPDFLoader
 from sentence_transformers import SentenceTransformer
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import FAISS
+from langchain.vectorstores import FAISS
 from tqdm import tqdm
 from pypdf import PdfMerger
-import git
 
 # Setup Logging
 logging.basicConfig(level=logging.INFO)
@@ -135,6 +134,7 @@ def augment_prompt(prompt):
         logger.error(f"Error in augment_prompt: {str(e)}", exc_info=True)
         return "Error: Unable to augment prompt."
 
+# Example usage
 if __name__ == "__main__":
     try:
         if len(sys.argv) > 1:
