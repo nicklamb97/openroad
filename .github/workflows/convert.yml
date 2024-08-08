@@ -168,8 +168,19 @@ jobs:
         
         echo "📋 Copying converted files..."
         cp -r ../converted_files/* .
-        git lfs track "faiss_index.pkl"
-        git add faiss_index.pkl
+
+        echo "📂 Listing files after copying:"
+        ls -alh
+
+        if [ -f "faiss_index.pkl" ]; then
+          echo "✅ faiss_index.pkl copied successfully."
+          git lfs track "faiss_index.pkl"
+          git add faiss_index.pkl
+        else
+          echo "❌ faiss_index.pkl not found after copy."
+          exit 1
+        fi
+
         git add .
         
         echo "💾 Committing changes..."
