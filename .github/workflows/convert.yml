@@ -84,6 +84,11 @@ jobs:
         sleep 20  # Increased wait time for server startup
         echo "✅ Server started successfully"
 
+    - name: Configure Git user
+      run: |
+        git config user.name "Nick Lamb"
+        git config user.email "nick.lamb@diegesis.co.uk"
+
     - name: Initialize and run RAG system
       if: env.MODEL_DOWNLOADED == 'true'
       run: |
