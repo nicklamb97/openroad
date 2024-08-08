@@ -39,3 +39,22 @@ phases:
       - mkdir -p converted_files
       - echo "✅ Directory created - converted_files"
       - echo "🔍 Finding changed Python files..."
+      - git diff-tree --no-commit-id --name-only -r $CODEBUILD_RESOLVED_SOURCE_VERSION | grep '\.py$' | while read file; do
+          echo "🐍➡️🔷 Converting $file to C#";
+          python_code=$(cat "$file");
+          output_file="converted_files/$(basename "${file%.py}.cs")";
+          echo "python_code:";
+          echo "$python_code";
+          echo "🌐 Using ilab model chat for conversion...";
+          prompt=$(sed "s/\${python_code}/$python_code/" convert_prompt.txt);
+          echo "🚀 Augmenting prompt using RAG system...";
+          augmented_prompt=$(python .github/workflows/rag_system.py "$prompt");
+          echo "🌐 Using ilab model chat for conversion...";
+          csharp_code=$(ilab model chat --max-tokens 30000 -qq "$augmented_prompt" 2>&1);
+          echo "$csharp_code" > "$output_file";
+          echo "✅ Converted $file to $output_file";
+        done
+
+  post_build:
+    commands:
+      - echo "Build completed on `date`"
