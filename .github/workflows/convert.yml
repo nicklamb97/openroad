@@ -155,7 +155,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GENERATED_REPO_TOKEN }}
       run: |
         echo "🔄 Cloning C# repository..."
-        git clone "https://github.com/nicklamb97/csharp.git" temp_csharp
+        git clone "https://github.com/nicklamb97/openroad.git" temp_csharp
         cd temp_csharp
         
         echo "🔧 Configuring git..."
@@ -189,12 +189,12 @@ jobs:
         git commit -m "Convert Python to C#: ${{ env.COMMIT_MESSAGE }}" || echo "No changes to commit"
         
         echo "🚀 Pushing new branch to repository..."
-        git push "https://$GITHUB_TOKEN@github.com/nicklamb97/csharp.git" "$BRANCH_NAME"
+        git push "https://$GITHUB_TOKEN@github.com/nicklamb97/openroad.git" "$BRANCH_NAME"
         
         echo "🔗 Creating pull request..."
         PR_URL=$(curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
              -H "Accept: application/vnd.github.v3+json" \
-             https://api.github.com/repos/nicklamb97/csharp/pulls \
+             https://api.github.com/repos/nicklamb97/openroad/pulls \
              -d "{
                \"title\": \"Automated Python to C# Conversion\",
                \"body\": \"This PR contains automatically converted C# code based on the following commit:\\n\\n${{ env.COMMIT_MESSAGE }}\\n\\nPlease review the converted code and merge if appropriate.\",
