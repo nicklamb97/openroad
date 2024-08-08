@@ -3,8 +3,8 @@ version: 0.2
 env:
   variables:
     PYTHON_VERSION: "3.10"
-    MODEL_NAME: "NickLamb/Mistral-7B-Instruct-v0.3"
-    MODEL_FILE: "Mistral-7B-Instruct-v0.3.Q4_K_M.gguf"
+    MODEL_NAME: "diegesis/OpenROAD-8B-Instruct"
+    MODEL_FILE: "OpenROAD-8B-Instruct.Q4_K_M.gguf"
     HF_TOKEN: ${HF_TOKEN}
 
 phases:
