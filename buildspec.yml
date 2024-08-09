@@ -72,8 +72,9 @@ phases:
       - echo "📝 InstructLab server started with PID - $SERVER_PID"
       - echo "⏳ Waiting for server to initialize (20 seconds)..."
       - sleep 20
-      - if ! kill -0 $SERVER_PID 2>/dev/null; then 
-          echo "❌ Error - InstructLab server failed to start. Check server.log for details."
+      - |
+        if ! kill -0 $SERVER_PID 2>/dev/null; then 
+          echo "❌ Error: InstructLab server failed to start. Check server.log for details."
           cat server.log
           exit 1
         fi
