@@ -61,9 +61,7 @@ phases:
       - echo "✅ Model downloaded successfully"
       
       - echo "🚀 Starting InstructLab server..."
-      - ilab model serve > server.log 2>&1 &
-      - SERVER_PID=$!
-      - echo "📝 Server PID - $SERVER_PID"
+      - ilab model serve
       - echo "⏳ Waiting for server to start..."
       - sleep 20
       - if ! kill -0 $SERVER_PID 2>/dev/null; then
