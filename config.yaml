@@ -8,7 +8,7 @@ chat:
   vi_mode: false
   visible_overflow: true
 general:
-  log_level: DEBUG
+  log_level: INFO
 generate:
   chunk_word_count: 1000
   model: models/Mistral-7B-Instruct-v0.3.Q4_K_M.gguf

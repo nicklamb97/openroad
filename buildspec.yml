@@ -8,6 +8,7 @@ env:
     HF_TOKEN: ${HF_TOKEN}
     REPO_URL: "https://github.com/nicklamb97/openroad.git"
     BRANCH_NAME: "main"
+    CSHARP_REPO_URL: "https://github.com/nicklamb97/csharp.git"
 
 phases:
   install:
@@ -119,6 +120,31 @@ phases:
 
   post_build:
     commands:
+      - echo "🔄 Cloning C# repository..."
+      - git clone $CSHARP_REPO_URL temp_csharp
+      - cd temp_csharp
+      
+      - echo "🔧 Configuring git..."
+      - git config user.name "Nick Lamb"
+      - git config user.email "nick.lamb@diegesis.co.uk"
+      
+      - echo "🔀 Creating new branch for converted files..."
+      - BRANCH_NAME="auto-convert-python-to-csharp-$(date +%Y%m%d-%H%M%S)"
+      - git checkout -b "$BRANCH_NAME"
+      
+      - echo "📋 Copying converted files..."
+      - cp -r ../converted_files/* .
+      - git add .
+      
+      - echo "💾 Committing changes..."
+      - git commit -m "Convert Python to C# - $COMMIT_MESSAGE" || echo "No changes to commit"
+      
+      - echo "🚀 Pushing new branch to repository..."
+      - git push "https://$GITHUB_TOKEN@github.com/nicklamb97/csharp.git" "$BRANCH_NAME"
+      
+      - echo "✅ New branch pushed successfully"
+      - echo "Please create a pull request manually or set up a GitHub Action to create it automatically."
+
       - echo "Build completed on `date`"
       - cd ..  # Return to the root directory
 
