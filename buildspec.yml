@@ -14,13 +14,14 @@ phases:
     runtime-versions:
       python: 3.10
     commands:
-      - echo "🔧 Installing Python and required packages..."
+      - echo "🔧 Installing Python, curl, and required packages..."
       - apt-get update -y
-      - apt-get install -y python3.10 python3.10-venv python3.10-dev
+      - apt-get install -y python3.10 python3.10-venv python3.10-dev curl
       - ln -sf /usr/bin/python3.10 /usr/local/bin/python
       - ln -sf /usr/bin/python3.10 /usr/local/bin/python3
       - python --version
       - which python
+      - curl --version
       - curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
       - python get-pip.py
       - python -m pip install --upgrade pip
