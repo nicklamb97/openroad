@@ -3,8 +3,8 @@ version: 0.2
 env:
   variables:
     PYTHON_VERSION: "3.10"
-    MODEL_NAME: "NickLamb/Mistral-7B-Instruct-v0.3"
-    MODEL_FILE: "Mistral-7B-Instruct-v0.3.Q4_K_M.gguf"
+    MODEL_NAME: "diegesis/OpenROAD-8B-Instruct"
+    MODEL_FILE: "OpenROAD-8B-Instruct.Q4_K_M.gguf"
     HF_TOKEN: ${HF_TOKEN}
     REPO_URL: "https://github.com/nicklamb97/openroad.git"
     BRANCH_NAME: "main"
@@ -63,7 +63,11 @@ phases:
           echo ""
         done
       
-      - echo "📥 Downloading InstructLab model - ${MODEL_FILE}"
+      - echo "🔐 Logging in to HuggingFace Hub..."
+      - python -c "from huggingface_hub import login; login(token='$HF_TOKEN')"
+      - echo "✅ Logged in to HuggingFace Hub successfully"
+      
+      - echo "📥 Downloading OpenROAD model - ${MODEL_FILE}"
       - HF_TOKEN="$HF_TOKEN" ilab model download --repository=${MODEL_NAME} --filename=${MODEL_FILE}
       - echo "✅ Model downloaded successfully"
       
