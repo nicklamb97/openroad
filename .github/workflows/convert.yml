@@ -83,8 +83,11 @@ jobs:
       if: env.MODEL_DOWNLOADED == 'true'
       run: |
         echo "🚀 Starting InstructLab server..."
-        nohup ilab model serve > server.log 2>&1 & SERVER_PID=$!
-        echo "📝 Server PID $SERVER_PID"
+        ilab model serve > server.log 2>&1 &
+        SERVER_PID=$!
+        disown
+
+        echo "📝 Server PID: $SERVER_PID"
 
         echo "⏳ Waiting for server to start..."
         sleep 20  # Wait time for server startup
@@ -132,7 +135,7 @@ jobs:
         done
 
         echo "🛑 Stopping InstructLab server..."
-        kill $SERVER_PID
+        kill $SERVER_PID || true
         echo "✅ Server stopped"
 
     - name: Create PR with converted files
