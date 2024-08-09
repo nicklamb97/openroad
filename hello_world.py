@@ -1,1 +1,1 @@
-print("Nick's first OpenROAD RAG pipeline!") 
+print("OpenROAD RAG pipeline") 
