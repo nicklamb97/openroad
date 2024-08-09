@@ -51,7 +51,7 @@ phases:
     commands:
       - echo "🗂️ Creating directory for converted files..."
       - mkdir -p converted_files
-      - echo "✅ Directory created: converted_files"
+      - echo "✅ Directory created - converted_files"
       - echo "🔍 Finding changed Python files..."
       - git diff-tree --no-commit-id --name-only -r $CODEBUILD_RESOLVED_SOURCE_VERSION | grep '\.py$' | while read file; do
           echo "🐍➡️🔷 Converting $file to C#";
