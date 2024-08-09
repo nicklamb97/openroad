@@ -71,9 +71,6 @@ phases:
       - HF_TOKEN="$HF_TOKEN" ilab model download --repository=${MODEL_NAME} --filename=${MODEL_FILE}
       - echo "✅ Model downloaded successfully"
 
-      - echo "Testing the ilab model serve on OpenROAD-8B-Instruct"
-      - ilab model serve
-
       - echo "🚀 Initializing InstructLab server..."
       - nohup ilab model serve > server.log 2>&1 & SERVER_PID=$!
       - echo "📝 InstructLab server started with PID - $SERVER_PID"
