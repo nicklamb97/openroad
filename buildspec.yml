@@ -15,148 +15,156 @@ phases:
     runtime-versions:
       python: 3.10
     commands:
-      - echo "🔧 Installing Python, curl, git, compilers, and required packages..."
+      - echo "🚀 Starting build process for Python to C# conversion"
+      - echo "🔧 Phase - INSTALL - Setting up the build environment"
+      - echo "📦 Updating package lists and installing required software..."
       - apt-get update -y
       - apt-get install -y python3.10 python3.10-venv python3.10-dev curl build-essential gcc g++ git tree
+      - echo "🐍 Configuring Python environment..."
       - ln -sf /usr/bin/python3.10 /usr/local/bin/python
       - ln -sf /usr/bin/python3.10 /usr/local/bin/python3
       - python --version
       - which python
+      - echo "🔍 Verifying installed software versions..."
       - curl --version
       - gcc --version
       - g++ --version
       - git --version
+      - echo "📥 Installing pip and required Python packages..."
       - curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
       - python get-pip.py
       - python -m pip install --upgrade pip
       - pip install wheel setuptools
       - pip install instructlab gitpython gradio sentence_transformers langchain_community tqdm huggingface_hub pypdf langchain faiss-cpu torch transformers langchain_text_splitters
-      - echo "✅ Dependencies installed successfully"
+      - echo "✅ Installation phase completed successfully"
+      - echo "📋 List of installed Python packages:"
       - pip list
-      - echo "📦 Above is the list of installed packages"
 
   pre_build:
     commands:
-      - echo "🔄 Cloning repository..."
+      - echo "🔧 Phase - PRE_BUILD - Preparing for code conversion"
+      - echo "🔄 Cloning source repository - $REPO_URL"
       - git clone $REPO_URL repo
       - cd repo
       - git checkout $BRANCH_NAME
-      - echo "✅ Repository cloned and checked out successfully"
+      - echo "✅ Repository cloned and checked out branch - $BRANCH_NAME"
       
-      - echo "📜 Retrieving commit message..."
+      - echo "📜 Retrieving commit message for the current build..."
       - COMMIT_MESSAGE=$(git log --format=%B -n 1 "$CODEBUILD_RESOLVED_SOURCE_VERSION")
-      - echo "Commit message - $COMMIT_MESSAGE"
+      - echo "💬 Commit message - $COMMIT_MESSAGE"
       
-      - echo "📄 Printing content of changed file(s):"
+      - echo "📄 Identifying and displaying changed Python files:"
       - |
         git diff-tree --no-commit-id --name-only -r $CODEBUILD_RESOLVED_SOURCE_VERSION | grep '\.py$' | while read file; do
-          echo "File: $file"
+          echo "🐍 File: $file"
           echo "=========================="
           cat "$file"
           echo "=========================="
           echo ""
         done
       
-      - echo "📥 Downloading ${MODEL_FILE} model..."
+      - echo "📥 Downloading InstructLab model - ${MODEL_FILE}"
       - HF_TOKEN="$HF_TOKEN" ilab model download --repository=${MODEL_NAME} --filename=${MODEL_FILE}
       - echo "✅ Model downloaded successfully"
       
-      - echo "🚀 Starting InstructLab server..."
+      - echo "🚀 Initializing InstructLab server..."
       - nohup ilab model serve > server.log 2>&1 & SERVER_PID=$!
-      - echo "📝 Server PID - $SERVER_PID"
-      - echo "⏳ Waiting for server to start..."
+      - echo "📝 InstructLab server started with PID - $SERVER_PID"
+      - echo "⏳ Waiting for server to initialize (20 seconds)..."
       - sleep 20
-      - if ! kill -0 $SERVER_PID 2>/dev/null; then echo "❌ Server failed to start"; exit 1; fi
-      - echo "✅ Server started successfully"
+      - if ! kill -0 $SERVER_PID 2>/dev/null; then 
+          echo "❌ Error - InstructLab server failed to start. Check server.log for details."
+          cat server.log
+          exit 1
+        fi
+      - echo "✅ InstructLab server initialized successfully"
       
-      - echo "🚀 Initializing RAG system..."
+      - echo "🧠 Initializing RAG (Retrieval-Augmented Generation) system..."
       - python .github/workflows/rag_system.py
-      - echo "✅ RAG system initialized and running"
+      - echo "✅ RAG system initialized and ready"
 
   build:
     commands:
-      - echo "🗂️ Creating directory for converted files..."
+      - echo "🔧 Phase - BUILD - Converting Python files to C#"
+      - echo "🗂️ Creating directory for converted files - converted_files"
       - mkdir -p converted_files
-      - echo "✅ Directory created - converted_files"
+      - echo "✅ Directory created successfully"
       
-      - echo "🔍 Finding changed Python files and converting to C#..."
+      - echo "🔍 Identifying changed Python files and converting to C#..."
       - |
         git diff-tree --no-commit-id --name-only -r $CODEBUILD_RESOLVED_SOURCE_VERSION | grep '\.py$' | while read file; do
-          echo "🐍➡️🔷 Converting $file to C#"
+          echo "🐍➡️🔷 Converting file: $file"
           python_code=$(cat "$file")
           output_file="converted_files/$(basename "${file%.py}.cs")"
-          echo "python_code:"
+          echo "📄 Original Python code:"
           echo "$python_code"
           
-          echo "🌐 Using ilab model chat for conversion..."
+          echo "🌐 Preparing conversion prompt..."
           prompt=$(sed "s/\${python_code}/$python_code/" convert_prompt.txt)
-          echo "prompt:"
-          echo "$prompt"
           
-          echo "🚀 Augmenting prompt using RAG system..."
+          echo "🚀 Augmenting prompt with RAG system..."
           augmented_prompt=$(python .github/workflows/rag_system.py "$prompt")
-          
-          echo "📄 Printing updated prompt:"
-          echo "============================"
+          echo "📄 Augmented prompt:"
           echo "$augmented_prompt"
-          echo "============================"
           
-          echo "🌐 Using ilab model chat for conversion..."
+          echo "🧠 Initiating InstructLab model for code conversion..."
           csharp_code=$(ilab model chat --max-tokens 30000 -qq "$augmented_prompt" 2>&1)
           exit_code=$?
           
-          echo "ilab model chat command completed with exit code: $exit_code"
-          echo "$csharp_code"
+          echo "InstructLab model completed with exit code: $exit_code"
+          if [ $exit_code -ne 0 ]; then
+            echo "⚠️ Warning: InstructLab model encountered an issue. Output may be incomplete."
+          fi
           
-          echo "💾 Saving converted code to $output_file"
+          echo "💾 Saving converted C# code to: $output_file"
           echo "$csharp_code" > "$output_file"
-          echo "✅ Converted $file to $output_file"
+          echo "✅ Conversion complete for $file"
           
-          echo "📄 Printing generated C# code:"
-          echo "============================"
+          echo "📄 Generated C# code:"
           cat "$output_file"
-          echo "============================"
+          echo "=========================="
         done
 
   post_build:
     commands:
+      - echo "🔧 Phase - POST_BUILD - Finalizing and committing converted code"
       - echo "🛑 Stopping InstructLab server..."
       - kill $SERVER_PID || true
-      - echo "✅ Server stopped"
+      - echo "✅ InstructLab server stopped"
 
-      - echo "📂 Debugging directory structure..."
+      - echo "📂 Current directory structure:"
       - pwd
-      - ls -R
       - tree -L 3
 
-      - echo "🔄 Cloning C# repository..."
+      - echo "🔄 Cloning C# repository - $CSHARP_REPO_URL"
       - git clone $CSHARP_REPO_URL temp_csharp
       - cd temp_csharp
       
-      - echo "🔧 Configuring git..."
+      - echo "🔧 Configuring git for commits..."
       - git config user.name "Nick Lamb"
       - git config user.email "nick.lamb@diegesis.co.uk"
       
       - echo "🔀 Creating new branch for converted files..."
       - BRANCH_NAME="auto-convert-python-to-csharp-$(date +%Y%m%d-%H%M%S)"
       - git checkout -b "$BRANCH_NAME"
+      - echo "✅ Created and switched to new branch - $BRANCH_NAME"
       
-      - echo "📋 Copying converted files..."
-      - cp -r ../converted_files/* . || echo "No files to copy"
-      - echo "Contents of current directory after copying:"
+      - echo "📋 Copying converted files to C# repository..."
+      - cp -r ../converted_files/* . || echo "⚠️ No new files to copy. All files may be up to date."
+      - echo "📂 Contents of C# repository after copying:"
       - ls -la
       
-      - echo "💾 Committing changes..."
+      - echo "💾 Committing changes to C# repository..."
       - git add .
-      - git commit -m "Convert Python to C# - $COMMIT_MESSAGE" || echo "No changes to commit"
+      - git commit -m "Convert Python to C# - $COMMIT_MESSAGE" || echo "ℹ️ No changes to commit. All files may be up to date."
       
-      - echo "🚀 Pushing new branch to repository..."
-      - git push "https://$GITHUB_TOKEN@github.com/nicklamb97/csharp.git" "$BRANCH_NAME" || echo "No changes to push"
+      - echo "🚀 Pushing new branch to C# repository..."
+      - git push "https://$GITHUB_TOKEN@github.com/nicklamb97/csharp.git" "$BRANCH_NAME" || echo "ℹ️ No changes to push. Branch may already exist or no new commits."
       
-      - echo "✅ New branch pushed successfully (if there were changes)"
-      - echo "Please create a pull request manually or set up a GitHub Action to create it automatically."
+      - echo "✅ C# repository updated successfully (if there were changes)"
+      - echo "🔗 To create a pull request, please visit https://github.com/nicklamb97/csharp/pull/new/$BRANCH_NAME"
 
-      - echo "Build completed on `date`"
+      - echo "🏁 Build process completed on $(date)"
       - cd ..  # Return to the root directory
 
 artifacts:
