@@ -61,8 +61,7 @@ phases:
       - echo "✅ Model downloaded successfully"
       
       - echo "🚀 Starting InstructLab server..."
-      - nohup ilab model serve > server.log 2>&1 &
-      - SERVER_PID=$!
+      - nohup ilab model serve > server.log 2>&1 & SERVER_PID=$!
       - echo "📝 Server PID - $SERVER_PID"
       - echo "⏳ Waiting for server to start..."
       - sleep 20
