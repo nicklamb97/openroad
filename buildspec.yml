@@ -22,7 +22,7 @@ phases:
   pre_build:
     commands:
       - echo "📥 Downloading ${MODEL_FILE} model..."
-      - HF_TOKEN=${HF_TOKEN} ilab model download --repository=${MODEL_NAME} --filename=${MODEL_FILE}
+      - HF_TOKEN="$HF_TOKEN" ilab model download --repository=${MODEL_NAME} --filename=${MODEL_FILE}
       - echo "✅ Model downloaded successfully"
       - echo "🚀 Starting InstructLab server..."
       - nohup ilab model serve > server.log 2>&1 &
