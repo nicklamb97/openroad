@@ -61,23 +61,12 @@ phases:
       - echo "✅ Model downloaded successfully"
       
       - echo "🚀 Starting InstructLab server..."
-      - ilab model serve
+      - nohup ilab model serve > server.log 2>&1 &
+      - SERVER_PID=$!
+      - echo "📝 Server PID - $SERVER_PID"
       - echo "⏳ Waiting for server to start..."
       - sleep 20
-      - if ! kill -0 $SERVER_PID 2>/dev/null; then
-          echo "❌ Server failed to start"
-          echo "📄 Server log contents:"
-          cat server.log
-          echo "💻 Process status:"
-          ps aux | grep ilab
-          echo "🔍 Checking for common issues:"
-          echo "Python version:"
-          python --version
-          echo "InstructLab version:"
-          pip show instructlab
-          echo "❗ Exiting due to server start failure"
-          exit 1
-        fi
+      - if ! kill -0 $SERVER_PID 2>/dev/null; then echo "❌ Server failed to start"; exit 1; fi
       - echo "✅ Server started successfully"
       
       - echo "🚀 Initializing RAG system..."
