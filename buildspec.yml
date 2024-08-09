@@ -31,7 +31,7 @@ phases:
       
       - echo "📜 Retrieving commit message..."
       - COMMIT_MESSAGE=$(git log --format=%B -n 1 "$CODEBUILD_RESOLVED_SOURCE_VERSION")
-      - echo "Commit message $COMMIT_MESSAGE"
+      - echo "Commit message - $COMMIT_MESSAGE"
       
       - echo "📄 Printing content of changed file(s):"
       - |
@@ -50,9 +50,10 @@ phases:
       - echo "🚀 Starting InstructLab server..."
       - nohup ilab model serve > server.log 2>&1 &
       - SERVER_PID=$!
-      - echo "📝 Server PID $SERVER_PID"
+      - echo "📝 Server PID - $SERVER_PID"
       - echo "⏳ Waiting for server to start..."
       - sleep 20
+      - if ! kill -0 $SERVER_PID 2>/dev/null; then echo "❌ Server failed to start"; exit 1; fi
       - echo "✅ Server started successfully"
       
       - echo "🚀 Initializing RAG system..."
@@ -63,7 +64,7 @@ phases:
     commands:
       - echo "🗂️ Creating directory for converted files..."
       - mkdir -p ../converted_files
-      - echo "✅ Directory created converted_files"
+      - echo "✅ Directory created - converted_files"
       
       - echo "🔍 Finding changed Python files and converting to C#..."
       - |
