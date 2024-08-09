@@ -17,7 +17,7 @@ phases:
     commands:
       - echo "🔧 Installing Python, curl, git, compilers, and required packages..."
       - apt-get update -y
-      - apt-get install -y python3.10 python3.10-venv python3.10-dev curl build-essential gcc g++ git
+      - apt-get install -y python3.10 python3.10-venv python3.10-dev curl build-essential gcc g++ git tree
       - ln -sf /usr/bin/python3.10 /usr/local/bin/python
       - ln -sf /usr/bin/python3.10 /usr/local/bin/python3
       - python --version
@@ -76,7 +76,7 @@ phases:
   build:
     commands:
       - echo "🗂️ Creating directory for converted files..."
-      - mkdir -p ../converted_files
+      - mkdir -p converted_files
       - echo "✅ Directory created - converted_files"
       
       - echo "🔍 Finding changed Python files and converting to C#..."
@@ -84,7 +84,7 @@ phases:
         git diff-tree --no-commit-id --name-only -r $CODEBUILD_RESOLVED_SOURCE_VERSION | grep '\.py$' | while read file; do
           echo "🐍➡️🔷 Converting $file to C#"
           python_code=$(cat "$file")
-          output_file="../converted_files/$(basename "${file%.py}.cs")"
+          output_file="converted_files/$(basename "${file%.py}.cs")"
           echo "python_code:"
           echo "$python_code"
           
@@ -120,6 +120,15 @@ phases:
 
   post_build:
     commands:
+      - echo "🛑 Stopping InstructLab server..."
+      - kill $SERVER_PID || true
+      - echo "✅ Server stopped"
+
+      - echo "📂 Debugging directory structure..."
+      - pwd
+      - ls -R
+      - tree -L 3
+
       - echo "🔄 Cloning C# repository..."
       - git clone $CSHARP_REPO_URL temp_csharp
       - cd temp_csharp
@@ -133,16 +142,18 @@ phases:
       - git checkout -b "$BRANCH_NAME"
       
       - echo "📋 Copying converted files..."
-      - cp -r ../converted_files/* .
-      - git add .
+      - cp -r ../converted_files/* . || echo "No files to copy"
+      - echo "Contents of current directory after copying:"
+      - ls -la
       
       - echo "💾 Committing changes..."
+      - git add .
       - git commit -m "Convert Python to C# - $COMMIT_MESSAGE" || echo "No changes to commit"
       
       - echo "🚀 Pushing new branch to repository..."
-      - git push "https://$GITHUB_TOKEN@github.com/nicklamb97/csharp.git" "$BRANCH_NAME"
+      - git push "https://$GITHUB_TOKEN@github.com/nicklamb97/csharp.git" "$BRANCH_NAME" || echo "No changes to push"
       
-      - echo "✅ New branch pushed successfully"
+      - echo "✅ New branch pushed successfully (if there were changes)"
       - echo "Please create a pull request manually or set up a GitHub Action to create it automatically."
 
       - echo "Build completed on `date`"
@@ -150,5 +161,5 @@ phases:
 
 artifacts:
   files:
-    - converted_files/**/*
+    - repo/converted_files/**/*
   name: converted-csharp-files-$(date +%Y-%m-%d)
