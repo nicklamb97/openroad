@@ -113,7 +113,7 @@ phases:
           echo "$augmented_prompt"
           
           echo "🧠 Initiating InstructLab model for code conversion..."
-          csharp_code=$(ilab model chat --max-tokens 30000 -qq "$augmented_prompt" 2>&1)
+          csharp_code=$(ilab model chat -qq "$augmented_prompt" 2>&1)
           exit_code=$?
           
           echo "InstructLab model completed with exit code: $exit_code"
