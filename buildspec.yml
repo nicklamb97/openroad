@@ -6,9 +6,8 @@ env:
     MODEL_NAME: "NickLamb/Mistral-7B-Instruct-v0.3"
     MODEL_FILE: "Mistral-7B-Instruct-v0.3.Q4_K_M.gguf"
     HF_TOKEN: ${HF_TOKEN}
-    # Add these environment variables
-    REPO_URL: "https://github.com/nicklamb97/openroad.git"  # The URL of your Git repository
-    BRANCH_NAME: "main" # The branch you want to build
+    REPO_URL: "https://github.com/nicklamb97/openroad.git"
+    BRANCH_NAME: "main"
 
 phases:
   install:
@@ -47,7 +46,6 @@ phases:
       - echo "📥 Downloading ${MODEL_FILE} model..."
       - HF_TOKEN="$HF_TOKEN" ilab model download --repository=${MODEL_NAME} --filename=${MODEL_FILE}
       - echo "✅ Model downloaded successfully"
-      - echo "MODEL_DOWNLOADED=true" >> $GITHUB_ENV
       
       - echo "🚀 Starting InstructLab server..."
       - nohup ilab model serve > server.log 2>&1 &
@@ -64,7 +62,7 @@ phases:
   build:
     commands:
       - echo "🗂️ Creating directory for converted files..."
-      - mkdir -p converted_files
+      - mkdir -p ../converted_files
       - echo "✅ Directory created converted_files"
       
       - echo "🔍 Finding changed Python files and converting to C#..."
