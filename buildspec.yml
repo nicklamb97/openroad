@@ -21,14 +21,33 @@ phases:
 
   pre_build:
     commands:
+      - echo "📜 Retrieving commit message..."
+      - COMMIT_MESSAGE=$(git log --format=%B -n 1 "$CODEBUILD_RESOLVED_SOURCE_VERSION")
+      - echo "Commit message: $COMMIT_MESSAGE"
+      
+      - echo "📄 Printing content of changed file(s):"
+      - |
+        git diff-tree --no-commit-id --name-only -r $CODEBUILD_RESOLVED_SOURCE_VERSION | grep '\.py$' | while read file; do
+          echo "File: $file"
+          echo "=========================="
+          cat "$file"
+          echo "=========================="
+          echo ""
+        done
+      
       - echo "📥 Downloading ${MODEL_FILE} model..."
       - HF_TOKEN="$HF_TOKEN" ilab model download --repository=${MODEL_NAME} --filename=${MODEL_FILE}
       - echo "✅ Model downloaded successfully"
+      - echo "MODEL_DOWNLOADED=true" >> $GITHUB_ENV
+      
       - echo "🚀 Starting InstructLab server..."
       - nohup ilab model serve > server.log 2>&1 &
+      - SERVER_PID=$!
+      - echo "📝 Server PID: $SERVER_PID"
       - echo "⏳ Waiting for server to start..."
       - sleep 20
       - echo "✅ Server started successfully"
+      
       - echo "🚀 Initializing RAG system..."
       - python .github/workflows/rag_system.py
       - echo "✅ RAG system initialized and running"
@@ -37,22 +56,45 @@ phases:
     commands:
       - echo "🗂️ Creating directory for converted files..."
       - mkdir -p converted_files
-      - echo "✅ Directory created - converted_files"
-      - echo "🔍 Finding changed Python files..."
-      - git diff-tree --no-commit-id --name-only -r $CODEBUILD_RESOLVED_SOURCE_VERSION | grep '\.py$' | while read file; do
-          echo "🐍➡️🔷 Converting $file to C#";
-          python_code=$(cat "$file");
-          output_file="converted_files/$(basename "${file%.py}.cs")";
-          echo "python_code:";
-          echo "$python_code";
-          echo "🌐 Using ilab model chat for conversion...";
-          prompt=$(sed "s/\${python_code}/$python_code/" convert_prompt.txt);
-          echo "🚀 Augmenting prompt using RAG system...";
-          augmented_prompt=$(python .github/workflows/rag_system.py "$prompt");
-          echo "🌐 Using ilab model chat for conversion...";
-          csharp_code=$(ilab model chat --max-tokens 30000 -qq "$augmented_prompt" 2>&1);
-          echo "$csharp_code" > "$output_file";
-          echo "✅ Converted $file to $output_file";
+      - echo "✅ Directory created: converted_files"
+      
+      - echo "🔍 Finding changed Python files and converting to C#..."
+      - |
+        git diff-tree --no-commit-id --name-only -r $CODEBUILD_RESOLVED_SOURCE_VERSION | grep '\.py$' | while read file; do
+          echo "🐍➡️🔷 Converting $file to C#"
+          python_code=$(cat "$file")
+          output_file="converted_files/$(basename "${file%.py}.cs")"
+          echo "python_code:"
+          echo "$python_code"
+          
+          echo "🌐 Using ilab model chat for conversion..."
+          prompt=$(sed "s/\${python_code}/$python_code/" convert_prompt.txt)
+          echo "prompt:"
+          echo "$prompt"
+          
+          echo "🚀 Augmenting prompt using RAG system..."
+          augmented_prompt=$(python .github/workflows/rag_system.py "$prompt")
+          
+          echo "📄 Printing updated prompt:"
+          echo "============================"
+          echo "$augmented_prompt"
+          echo "============================"
+          
+          echo "🌐 Using ilab model chat for conversion..."
+          csharp_code=$(ilab model chat --max-tokens 30000 -qq "$augmented_prompt" 2>&1)
+          exit_code=$?
+          
+          echo "ilab model chat command completed with exit code: $exit_code"
+          echo "$csharp_code"
+          
+          echo "💾 Saving converted code to $output_file"
+          echo "$csharp_code" > "$output_file"
+          echo "✅ Converted $file to $output_file"
+          
+          echo "📄 Printing generated C# code:"
+          echo "============================"
+          cat "$output_file"
+          echo "============================"
         done
 
   post_build:
